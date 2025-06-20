@@ -21,9 +21,10 @@ interface LogTradeProps {
   trades: Trade[];
   onAddTrade: (trade: Omit<Trade, 'id'>) => void;
   onCloseTrade: (tradeId: string, reason: string) => void;
+  isFirstTrade?: boolean;
 }
 
-const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
+const LogTrade = ({ trades, onAddTrade, onCloseTrade, isFirstTrade = false }: LogTradeProps) => {
   const [tradeType, setTradeType] = useState<'open' | 'close'>('open');
   const [ticker, setTicker] = useState('');
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
@@ -36,9 +37,8 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
 
   const fetchPrice = async (symbol: string) => {
     setIsLoading(true);
-    // Simulate API call - in real implementation, you'd connect to a financial data API
     await new Promise(resolve => setTimeout(resolve, 500));
-    const mockPrice = Math.random() * 200 + 50; // Random price between 50-250
+    const mockPrice = Math.random() * 200 + 50;
     setCurrentPrice(mockPrice);
     setIsLoading(false);
   };
@@ -64,7 +64,6 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
       status: 'open'
     });
 
-    // Reset form
     setTicker('');
     setReason('');
     setCurrentPrice(null);
@@ -75,20 +74,94 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
     
     onCloseTrade(selectedTradeId, reason.trim());
     
-    // Reset form
     setSelectedTradeId('');
     setReason('');
   };
 
+  if (isFirstTrade) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center mb-8">
+          <h3 className="text-2xl font-bold text-white mb-2">Log Your First Trade</h3>
+          <p className="text-gray-300">Start your investment tracking journey</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="ticker" className="text-white font-medium">
+              Stock Ticker
+            </Label>
+            <Input
+              id="ticker"
+              placeholder="e.g., AAPL"
+              value={ticker}
+              onChange={(e) => handleTickerChange(e.target.value)}
+              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 backdrop-blur-sm"
+            />
+            {isLoading && (
+              <p className="text-xs text-gray-400">Fetching price...</p>
+            )}
+            {currentPrice && (
+              <p className="text-xs text-green-400 font-medium">
+                Current Price: ${currentPrice.toFixed(2)}
+              </p>
+            )}
+          </div>
+          
+          <div className="space-y-2">
+            <Label className="text-white font-medium">
+              Position Type
+            </Label>
+            <Select value={side} onValueChange={(value: 'buy' | 'sell') => setSide(value)}>
+              <SelectTrigger className="bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800 border-gray-700">
+                <SelectItem value="buy" className="text-white">Buy (Long)</SelectItem>
+                <SelectItem value="sell" className="text-white">Sell (Short)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="reason" className="text-white font-medium">
+            Investment Rationale
+          </Label>
+          <Textarea
+            id="reason"
+            placeholder="Why are you making this trade? What's your thesis?"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            maxLength={300}
+            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 backdrop-blur-sm resize-none"
+            rows={4}
+          />
+          <p className="text-xs text-gray-400">
+            {reason.length}/300 characters
+          </p>
+        </div>
+        
+        <Button 
+          onClick={handleOpenTrade}
+          disabled={!ticker || !reason.trim() || !currentPrice}
+          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-3"
+        >
+          Log My First Trade
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8">
-      <div className="flex space-x-1 bg-gray-50 p-1 rounded-lg w-fit">
+    <div className="space-y-8 p-8">
+      <div className="flex space-x-1 bg-white/10 p-1 rounded-lg w-fit backdrop-blur-sm">
         <button
           onClick={() => setTradeType('open')}
           className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
             tradeType === 'open' 
-              ? 'bg-white text-gray-900 shadow-sm' 
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-white/20 text-white shadow-sm backdrop-blur-sm' 
+              : 'text-gray-300 hover:text-white hover:bg-white/5'
           }`}
         >
           Open Trade
@@ -97,17 +170,17 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
           onClick={() => setTradeType('close')}
           className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
             tradeType === 'close' 
-              ? 'bg-white text-gray-900 shadow-sm' 
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-white/20 text-white shadow-sm backdrop-blur-sm' 
+              : 'text-gray-300 hover:text-white hover:bg-white/5'
           }`}
         >
           Close Trade
         </button>
       </div>
 
-      <Card className="border-0 shadow-none bg-gray-50">
+      <Card className="border-0 shadow-none bg-white/10 backdrop-blur-md border border-white/20">
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg font-semibold">
+          <CardTitle className="text-lg font-semibold text-white">
             {tradeType === 'open' ? 'Open New Position' : 'Close Existing Position'}
           </CardTitle>
         </CardHeader>
@@ -116,7 +189,7 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
             <>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="ticker" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="ticker" className="text-sm font-medium text-gray-200">
                     Ticker
                   </Label>
                   <Input
@@ -124,29 +197,29 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
                     placeholder="AAPL"
                     value={ticker}
                     onChange={(e) => handleTickerChange(e.target.value)}
-                    className="text-sm"
+                    className="text-sm bg-white/10 border-white/20 text-white placeholder:text-gray-400"
                   />
                   {isLoading && (
-                    <p className="text-xs text-gray-500">Fetching price...</p>
+                    <p className="text-xs text-gray-400">Fetching price...</p>
                   )}
                   {currentPrice && (
-                    <p className="text-xs text-green-600 font-medium">
+                    <p className="text-xs text-green-400 font-medium">
                       Current Price: ${currentPrice.toFixed(2)}
                     </p>
                   )}
                 </div>
                 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
+                  <Label className="text-sm font-medium text-gray-200">
                     Position
                   </Label>
                   <Select value={side} onValueChange={(value: 'buy' | 'sell') => setSide(value)}>
-                    <SelectTrigger className="text-sm">
+                    <SelectTrigger className="text-sm bg-white/10 border-white/20 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="buy">Buy (Long)</SelectItem>
-                      <SelectItem value="sell">Sell (Short)</SelectItem>
+                    <SelectContent className="bg-gray-800 border-gray-700">
+                      <SelectItem value="buy" className="text-white">Buy (Long)</SelectItem>
+                      <SelectItem value="sell" className="text-white">Sell (Short)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -154,16 +227,16 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
             </>
           ) : (
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
+              <Label className="text-sm font-medium text-gray-200">
                 Select Position to Close
               </Label>
               <Select value={selectedTradeId} onValueChange={setSelectedTradeId}>
-                <SelectTrigger className="text-sm">
+                <SelectTrigger className="text-sm bg-white/10 border-white/20 text-white">
                   <SelectValue placeholder="Select an open position" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-gray-800 border-gray-700">
                   {openTrades.map((trade) => (
-                    <SelectItem key={trade.id} value={trade.id}>
+                    <SelectItem key={trade.id} value={trade.id} className="text-white">
                       {trade.ticker} - {trade.side.toUpperCase()} @ ${trade.entryPrice.toFixed(2)}
                     </SelectItem>
                   ))}
@@ -173,7 +246,7 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="reason" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="reason" className="text-sm font-medium text-gray-200">
               Reason
             </Label>
             <Textarea
@@ -182,10 +255,10 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               maxLength={300}
-              className="text-sm resize-none"
+              className="text-sm resize-none bg-white/10 border-white/20 text-white placeholder:text-gray-400"
               rows={4}
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-400">
               {reason.length}/300 characters
             </p>
           </div>
@@ -197,7 +270,7 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
                 ? !ticker || !reason.trim() || !currentPrice 
                 : !selectedTradeId || !reason.trim()
             }
-            className="w-full text-sm"
+            className="w-full text-sm bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
           >
             {tradeType === 'open' ? 'Log Trade' : 'Close Position'}
           </Button>

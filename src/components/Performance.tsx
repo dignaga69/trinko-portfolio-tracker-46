@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -72,240 +71,136 @@ const Performance = ({ trades }: PerformanceProps) => {
   const successRateAll = totalTrades > 0 ? (allSuccessfulTrades.length / totalTrades) * 100 : 0;
   const successRateClosed = closedTrades.length > 0 ? (successfulTrades.length / closedTrades.length) * 100 : 0;
 
+  const openTradeReturns = trades.filter(trade => trade.status === 'open').map(trade => {
+    const returns = calculateReturns(trade);
+    return {
+      id: trade.id,
+      ticker: trade.ticker,
+      side: trade.side,
+      return: returns.tickerReturn!
+    };
+  });
+
   return (
-    <div className="space-y-6">
-      {/* Profile Section */}
-      <Card className="border-0 shadow-none bg-gray-50">
-        <CardContent className="pt-6">
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <Avatar className="w-16 h-16">
-                <AvatarImage src="" />
-                <AvatarFallback className="text-lg font-semibold">TG</AvatarFallback>
-              </Avatar>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">TradeGuru</h2>
-                <p className="text-sm text-gray-600">Member since January 2023</p>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" className="gap-2">
-              <Edit2 className="w-4 h-4" />
-              Edit Profile
-            </Button>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">Bio</h4>
-              <p className="text-sm text-gray-600">
-                Passionate trader focused on value investing and long-term growth strategies. 5+ years of market experience.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">Social Links</h4>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="w-10 h-10 p-0">
-                  <Twitter className="w-4 h-4" />
-                </Button>
-                <Button variant="outline" size="sm" className="w-10 h-10 p-0">
-                  <Linkedin className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen p-8 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="max-w-6xl mx-auto space-y-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-white mb-4">Performance Dashboard</h1>
+          <p className="text-gray-300">Track your investment performance and analyze your trading patterns</p>
+        </div>
 
-      <Card className="border-0 shadow-none bg-gray-50">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Overview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            <div className="grid grid-cols-3 gap-8">
-              <div className="space-y-4">
-                <h4 className="text-sm font-semibold text-gray-700 text-center border-b border-gray-200 pb-2">Number of Trades</h4>
-                <div className="text-center">
-                  <div className="text-xl font-bold text-gray-900">{totalTrades}</div>
-                  <div className="text-xs text-gray-600">Total</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl font-bold text-green-600">{openTrades.length}</div>
-                  <div className="text-xs text-gray-600">Open</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl font-bold text-blue-600">{closedTrades.length}</div>
-                  <div className="text-xs text-gray-600">Closed</div>
-                </div>
+        {/* User Profile Section */}
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-xl">TG</span>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-white">TradeGuru</h2>
+              <p className="text-gray-300">Active Trader • Member since 2024</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Overview Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Number of Trades */}
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+            <h3 className="text-lg font-semibold text-white mb-4">Number of Trades</h3>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-white">{totalTrades}</p>
+                <p className="text-sm text-gray-300">Total</p>
               </div>
-              
-              <div className="space-y-4">
-                <h4 className="text-sm font-semibold text-gray-700 text-center border-b border-gray-200 pb-2">All Trades</h4>
-                <div className="text-center">
-                  <div className="text-xl font-bold text-gray-900">{successRateAll.toFixed(1)}%</div>
-                  <div className="text-xs text-gray-600">Success Rate</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl font-bold text-gray-900">
-                    {closedTrades.length > 0 ? (
-                      <span className={averageAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'}>
-                        {averageAlphaAll >= 0 ? '+' : ''}{averageAlphaAll.toFixed(2)}%
-                      </span>
-                    ) : 'N/A'}
-                  </div>
-                  <div className="text-xs text-gray-600">Average Alpha</div>
-                </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-blue-400">{openTrades}</p>
+                <p className="text-sm text-gray-300">Open</p>
               </div>
-              
-              <div className="space-y-4">
-                <h4 className="text-sm font-semibold text-gray-700 text-center border-b border-gray-200 pb-2">Closed Only</h4>
-                <div className="text-center">
-                  <div className="text-xl font-bold text-gray-900">{successRateClosed.toFixed(1)}%</div>
-                  <div className="text-xs text-gray-600">Success Rate</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl font-bold text-gray-900">
-                    {closedTrades.length > 0 ? (
-                      <span className={averageAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'}>
-                        {averageAlphaClosed >= 0 ? '+' : ''}{averageAlphaClosed.toFixed(2)}%
-                      </span>
-                    ) : 'N/A'}
-                  </div>
-                  <div className="text-xs text-gray-600">Average Alpha</div>
-                </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-green-400">{closedTrades}</p>
+                <p className="text-sm text-gray-300">Closed</p>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      <Card className="border-0 shadow-none bg-gray-50">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Trade History</CardTitle>
-        </CardHeader>
-        <CardContent>
+          {/* Success Rate */}
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+            <h3 className="text-lg font-semibold text-white mb-4">Success Rate</h3>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-green-400 mb-2">{successRate}%</p>
+              <p className="text-sm text-gray-300">Winning trades</p>
+            </div>
+          </div>
+
+          {/* Average Alpha */}
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+            <h3 className="text-lg font-semibold text-white mb-4">Average Alpha</h3>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-purple-400 mb-2">{averageAlpha}%</p>
+              <p className="text-sm text-gray-300">Per trade</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Running Returns for Open Trades */}
+        {openTradeReturns.length > 0 && (
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+            <h3 className="text-lg font-semibold text-white mb-4">Open Positions</h3>
+            <div className="space-y-3">
+              {openTradeReturns.map((trade) => (
+                <div key={trade.id} className="flex justify-between items-center py-2 border-b border-white/10">
+                  <div>
+                    <span className="text-white font-medium">{trade.ticker}</span>
+                    <span className="text-gray-300 ml-2">{trade.side.toUpperCase()}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className={`font-bold ${trade.return >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {trade.return >= 0 ? '+' : ''}{trade.return.toFixed(2)}%
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Performance Chart */}
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4">Performance Over Time</h3>
+          <div className="h-64 flex items-center justify-center text-gray-400">
+            Chart visualization coming soon...
+          </div>
+        </div>
+
+        {/* Recent Trades */}
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4">Recent Trades</h3>
           {trades.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-8">
-              No trades logged yet. Start by logging your first trade.
-            </p>
+            <p className="text-gray-400 text-center py-8">No trades logged yet</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                      Ticker
-                    </th>
-                    <th className="text-left py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                      Entry Date
-                    </th>
-                    <th className="text-left py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                      Long/Short
-                    </th>
-                    <th className="text-right py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                      Entry Price
-                    </th>
-                    <th className="text-left py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                      Close Date
-                    </th>
-                    <th className="text-right py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                      Exit Price
-                    </th>
-                    <th className="text-right py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                      Ticker Return
-                    </th>
-                    <th className="text-right py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                      S&P500 Return
-                    </th>
-                    <th className="text-right py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                      Alpha
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {trades.map((trade) => {
-                    const returns = calculateReturns(trade);
-                    return (
-                      <tr key={trade.id} className="border-b border-gray-100 hover:bg-gray-25">
-                        <td className="py-3 px-2 text-sm font-medium text-gray-900 font-mono">
-                          {trade.ticker}
-                        </td>
-                        <td className="py-3 px-2 text-sm text-gray-600 font-mono">
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button className="hover:text-blue-600 hover:underline text-left">
-                                {trade.entryDate.toLocaleDateString()}
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80 max-h-40 overflow-y-auto">
-                              <div className="space-y-2">
-                                <h4 className="font-medium text-sm">Entry Reason</h4>
-                                <p className="text-xs text-gray-600 whitespace-pre-wrap">
-                                  {trade.reason}
-                                </p>
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </td>
-                        <td className="py-3 px-2 text-sm">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            trade.side === 'buy' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {trade.side === 'buy' ? 'Long' : 'Short'}
-                          </span>
-                        </td>
-                        <td className="py-3 px-2 text-sm text-gray-900 text-right font-mono">
-                          ${trade.entryPrice.toFixed(2)}
-                        </td>
-                        <td className="py-3 px-2 text-sm text-gray-600 font-mono">
-                          {trade.exitDate ? (
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <button className="hover:text-blue-600 hover:underline text-left">
-                                  {trade.exitDate.toLocaleDateString()}
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-80 max-h-40 overflow-y-auto">
-                                <div className="space-y-2">
-                                  <h4 className="font-medium text-sm">Close Reason</h4>
-                                  <p className="text-xs text-gray-600 whitespace-pre-wrap">
-                                    {trade.closeReason || 'No reason provided'}
-                                  </p>
-                                </div>
-                              </PopoverContent>
-                            </Popover>
-                          ) : 'N/A'}
-                        </td>
-                        <td className="py-3 px-2 text-sm text-gray-900 text-right font-mono">
-                          {trade.exitPrice ? `$${trade.exitPrice.toFixed(2)}` : 'N/A'}
-                        </td>
-                        <td className="py-3 px-2 text-sm text-right font-mono">
-                          <span className={returns.tickerReturn >= 0 ? 'text-green-600' : 'text-red-600'}>
-                            {returns.tickerReturn.toFixed(2)}%
-                          </span>
-                        </td>
-                        <td className="py-3 px-2 text-sm text-right font-mono">
-                          <span className={returns.sp500Return >= 0 ? 'text-green-600' : 'text-red-600'}>
-                            {returns.sp500Return.toFixed(2)}%
-                          </span>
-                        </td>
-                        <td className="py-3 px-2 text-sm text-right font-mono font-semibold">
-                          <span className={returns.alpha >= 0 ? 'text-green-600' : 'text-red-600'}>
-                            {returns.alpha.toFixed(2)}%
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            <div className="space-y-3">
+              {trades.slice(-5).reverse().map((trade) => (
+                <div key={trade.id} className="flex justify-between items-center py-3 border-b border-white/10 last:border-b-0">
+                  <div>
+                    <span className="text-white font-medium">{trade.ticker}</span>
+                    <span className="text-gray-300 ml-2">{trade.side.toUpperCase()}</span>
+                    <span className="text-gray-400 ml-2 text-sm">${trade.entryPrice.toFixed(2)}</span>
+                  </div>
+                  <div className="text-right">
+                    <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                      trade.status === 'open' 
+                        ? 'bg-blue-500/20 text-blue-400' 
+                        : 'bg-green-500/20 text-green-400'
+                    }`}>
+                      {trade.status.toUpperCase()}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };
