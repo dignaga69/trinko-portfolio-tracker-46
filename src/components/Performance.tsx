@@ -1,9 +1,9 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Edit2, Twitter, Linkedin } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 interface Trade {
   id: string;
@@ -103,7 +103,7 @@ const Performance = ({ trades }: PerformanceProps) => {
             </div>
             
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">Social Links</h4>
+              <Separator className="my-4" />
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="w-10 h-10 p-0">
                   <Twitter className="w-4 h-4" />

@@ -1,8 +1,10 @@
+
 import { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import LogTrade from '@/components/LogTrade';
 import Performance from '@/components/Performance';
 import Community from '@/components/Community';
+import Footer from '@/components/Footer';
 
 interface Trade {
   id: string;
@@ -66,17 +68,21 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Sidebar 
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-      />
+    <div className="min-h-screen bg-white flex flex-col">
+      <div className="flex flex-1">
+        <Sidebar 
+          activeSection={activeSection}
+          onSectionChange={setActiveSection}
+        />
+        
+        <main className="flex-1 ml-64 px-8 py-8">
+          <div className="max-w-6xl mx-auto">
+            {renderContent()}
+          </div>
+        </main>
+      </div>
       
-      <main className="ml-64 p-8">
-        <div className="max-w-4xl">
-          {renderContent()}
-        </div>
-      </main>
+      <Footer />
     </div>
   );
 };

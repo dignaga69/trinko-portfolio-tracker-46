@@ -1,170 +1,154 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ChevronUp, ChevronDown } from 'lucide-react';
-
-interface LeaderboardUser {
-  id: string;
-  username: string;
-  numberOfTrades: number;
-  successRateAll: number;
-  averageAlphaAll: number;
-  successRateClosed: number;
-  averageAlphaClosed: number;
-}
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Community = () => {
-  const [sortField, setSortField] = useState<keyof LeaderboardUser>('averageAlphaAll');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [filterDialogOpen, setFilterDialogOpen] = useState<string | null>(null);
-  const [filterValues, setFilterValues] = useState({
-    numberOfTrades: { min: '', max: '' },
-    successRateAll: { min: '', max: '' },
-    averageAlphaAll: { min: '', max: '' },
-    successRateClosed: { min: '', max: '' },
-    averageAlphaClosed: { min: '', max: '' }
-  });
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, { min: number; max: number }>>({});
 
-  // Mock data for leaderboard
-  const mockUsers: LeaderboardUser[] = [
+  const mockLeaderboardData = [
     {
       id: '1',
-      username: 'TradeGuru',
-      numberOfTrades: 45,
-      successRateAll: 78.2,
-      averageAlphaAll: 12.5,
+      name: 'TradeGuru',
+      avatar: '',
+      trades: 42,
+      successRateAll: 78.5,
+      avgAlphaAll: 12.3,
       successRateClosed: 82.1,
-      averageAlphaClosed: 15.3
+      avgAlphaClosed: 15.7,
     },
     {
       id: '2',
-      username: 'AlphaHunter',
-      numberOfTrades: 32,
-      successRateAll: 71.9,
-      averageAlphaAll: 8.7,
-      successRateClosed: 75.0,
-      averageAlphaClosed: 11.2
+      name: 'StockMaster',
+      avatar: '',
+      trades: 38,
+      successRateAll: 72.3,
+      avgAlphaAll: 9.8,
+      successRateClosed: 75.6,
+      avgAlphaClosed: 11.2,
     },
     {
       id: '3',
-      username: 'MarketMaster',
-      numberOfTrades: 28,
-      successRateAll: 85.7,
-      averageAlphaAll: 14.2,
-      successRateClosed: 89.3,
-      averageAlphaClosed: 16.8
+      name: 'InvestPro',
+      avatar: '',
+      trades: 55,
+      successRateAll: 68.9,
+      avgAlphaAll: 8.5,
+      successRateClosed: 71.4,
+      avgAlphaClosed: 10.1,
     },
-    {
-      id: '4',
-      username: 'BullRunner',
-      numberOfTrades: 15,
-      successRateAll: 66.7,
-      averageAlphaAll: 6.4,
-      successRateClosed: 70.0,
-      averageAlphaClosed: 8.1
-    },
-    {
-      id: '5',
-      username: 'ValueSeeker',
-      numberOfTrades: 52,
-      successRateAll: 73.1,
-      averageAlphaAll: 9.8,
-      successRateClosed: 76.9,
-      averageAlphaClosed: 12.4
-    }
   ];
 
-  const handleSort = (field: keyof LeaderboardUser) => {
-    if (field === sortField) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('desc');
-    }
+  const filterOptions = [
+    { key: 'trades', label: 'Number of Trades', getValue: (user: any) => user.trades },
+    { key: 'successRateAll', label: 'Success Rate (All)', getValue: (user: any) => user.successRateAll },
+    { key: 'avgAlphaAll', label: 'Average Alpha (All)', getValue: (user: any) => user.avgAlphaAll },
+    { key: 'successRateClosed', label: 'Success Rate (Closed)', getValue: (user: any) => user.successRateClosed },
+    { key: 'avgAlphaClosed', label: 'Average Alpha (Closed)', getValue: (user: any) => user.avgAlphaClosed },
+  ];
+
+  const FilterDialog = ({ filterKey, label }: { filterKey: string; label: string }) => {
+    const [minValue, setMinValue] = useState(appliedFilters[filterKey]?.min?.toString() || '');
+    const [maxValue, setMaxValue] = useState(appliedFilters[filterKey]?.max?.toString() || '');
+    const [open, setOpen] = useState(false);
+
+    const handleApplyFilter = () => {
+      const min = parseFloat(minValue) || 0;
+      const max = parseFloat(maxValue) || Infinity;
+      
+      if (min > 0 || max < Infinity) {
+        setAppliedFilters(prev => ({
+          ...prev,
+          [filterKey]: { min, max }
+        }));
+      } else {
+        setAppliedFilters(prev => {
+          const newFilters = { ...prev };
+          delete newFilters[filterKey];
+          return newFilters;
+        });
+      }
+      setOpen(false);
+    };
+
+    const handleClearFilter = () => {
+      setMinValue('');
+      setMaxValue('');
+      setAppliedFilters(prev => {
+        const newFilters = { ...prev };
+        delete newFilters[filterKey];
+        return newFilters;
+      });
+      setOpen(false);
+    };
+
+    const isActive = appliedFilters[filterKey];
+
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className={`${isActive ? 'bg-blue-50 border-blue-200 text-blue-700' : ''}`}
+          >
+            {label}
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Filter by {label}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="min">Minimum</Label>
+                <Input
+                  id="min"
+                  type="number"
+                  value={minValue}
+                  onChange={(e) => setMinValue(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="max">Maximum</Label>
+                <Input
+                  id="max"
+                  type="number"
+                  value={maxValue}
+                  onChange={(e) => setMaxValue(e.target.value)}
+                  placeholder="No limit"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button onClick={handleApplyFilter} className="flex-1">
+                Apply Filter
+              </Button>
+              <Button variant="outline" onClick={handleClearFilter}>
+                Clear
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
   };
 
-  const handleUserClick = (username: string) => {
-    console.log(`Navigating to ${username}'s profile`);
-    // This would navigate to the user's profile page
-  };
-
-  const handleFilterApply = (filterType: string) => {
-    console.log(`Applying filter for ${filterType}:`, filterValues[filterType as keyof typeof filterValues]);
-    setFilterDialogOpen(null);
-  };
-
-  const handleFilterClear = (filterType: string) => {
-    setFilterValues(prev => ({
-      ...prev,
-      [filterType]: { min: '', max: '' }
-    }));
-  };
-
-  const sortedUsers = [...mockUsers].sort((a, b) => {
-    const aValue = a[sortField];
-    const bValue = b[sortField];
-    const multiplier = sortDirection === 'asc' ? 1 : -1;
-    return (aValue > bValue ? 1 : -1) * multiplier;
+  const filteredLeaderboard = mockLeaderboardData.filter(user => {
+    return Object.entries(appliedFilters).every(([key, range]) => {
+      const filterOption = filterOptions.find(f => f.key === key);
+      if (!filterOption) return true;
+      
+      const value = filterOption.getValue(user);
+      return value >= range.min && value <= range.max;
+    });
   });
-
-  const SortIcon = ({ field }: { field: keyof LeaderboardUser }) => {
-    if (field !== sortField) return null;
-    return sortDirection === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
-  };
-
-  const FilterDialog = ({ filterType, label }: { filterType: string; label: string }) => (
-    <Dialog open={filterDialogOpen === filterType} onOpenChange={(open) => setFilterDialogOpen(open ? filterType : null)}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="text-xs">
-          {label}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[400px]">
-        <DialogHeader>
-          <DialogTitle>{label}</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="min-value" className="text-sm">Minimum</Label>
-              <Input
-                id="min-value"
-                placeholder="Min"
-                value={filterValues[filterType as keyof typeof filterValues].min}
-                onChange={(e) => setFilterValues(prev => ({
-                  ...prev,
-                  [filterType]: { ...prev[filterType as keyof typeof filterValues], min: e.target.value }
-                }))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="max-value" className="text-sm">Maximum</Label>
-              <Input
-                id="max-value"
-                placeholder="Max"
-                value={filterValues[filterType as keyof typeof filterValues].max}
-                onChange={(e) => setFilterValues(prev => ({
-                  ...prev,
-                  [filterType]: { ...prev[filterType as keyof typeof filterValues], max: e.target.value }
-                }))}
-              />
-            </div>
-          </div>
-          <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={() => handleFilterClear(filterType)}>
-              Clear
-            </Button>
-            <Button onClick={() => handleFilterApply(filterType)}>
-              Apply
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
 
   return (
     <div className="space-y-6">
@@ -173,124 +157,70 @@ const Community = () => {
           <CardTitle className="text-lg font-semibold">Leaderboard</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Filters Section */}
-          <div className="mb-6 p-4 bg-white rounded-lg border">
-            <h4 className="text-sm font-semibold text-gray-700 mb-3">Filters</h4>
+          <div className="space-y-4">
             <div className="flex flex-wrap gap-2">
-              <FilterDialog filterType="numberOfTrades" label="Number of Trades" />
-              <FilterDialog filterType="successRateAll" label="Success Rate (All)" />
-              <FilterDialog filterType="averageAlphaAll" label="Average Alpha (All)" />
-              <FilterDialog filterType="successRateClosed" label="Success Rate (Closed)" />
-              <FilterDialog filterType="averageAlphaClosed" label="Average Alpha (Closed)" />
+              {filterOptions.map((filter) => (
+                <FilterDialog
+                  key={filter.key}
+                  filterKey={filter.key}
+                  label={filter.label}
+                />
+              ))}
             </div>
-          </div>
 
-          {/* Leaderboard Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                    Rank
-                  </th>
-                  <th className="text-left py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                    Username
-                  </th>
-                  <th 
-                    className="text-right py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide cursor-pointer hover:text-gray-800"
-                    onClick={() => handleSort('numberOfTrades')}
+            <div className="space-y-3">
+              {filteredLeaderboard.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-8">
+                  No traders match your current filters.
+                </p>
+              ) : (
+                filteredLeaderboard.map((user, index) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
                   >
-                    <div className="flex items-center justify-end gap-1">
-                      Number of Trades
-                      <SortIcon field="numberOfTrades" />
-                    </div>
-                  </th>
-                  <th className="text-center py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                    All Trades
-                  </th>
-                  <th className="text-center py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                    Closed Only
-                  </th>
-                </tr>
-                <tr className="border-b border-gray-100">
-                  <th></th>
-                  <th></th>
-                  <th></th>
-                  <th className="text-center py-2 px-2">
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div 
-                        className="cursor-pointer hover:text-gray-800 flex items-center justify-center gap-1"
-                        onClick={() => handleSort('successRateAll')}
-                      >
-                        Success Rate
-                        <SortIcon field="successRateAll" />
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full text-sm font-semibold text-gray-600">
+                        #{index + 1}
                       </div>
-                      <div 
-                        className="cursor-pointer hover:text-gray-800 flex items-center justify-center gap-1"
-                        onClick={() => handleSort('averageAlphaAll')}
-                      >
-                        Avg Alpha
-                        <SortIcon field="averageAlphaAll" />
+                      <Avatar className="w-10 h-10">
+                        <AvatarImage src={user.avatar} />
+                        <AvatarFallback className="text-sm font-semibold">
+                          {user.name.substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium text-gray-900">{user.name}</div>
+                        <div className="text-sm text-gray-500">{user.trades} trades</div>
                       </div>
                     </div>
-                  </th>
-                  <th className="text-center py-2 px-2">
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div 
-                        className="cursor-pointer hover:text-gray-800 flex items-center justify-center gap-1"
-                        onClick={() => handleSort('successRateClosed')}
-                      >
-                        Success Rate
-                        <SortIcon field="successRateClosed" />
+
+                    <div className="flex gap-6 text-sm">
+                      <div className="text-center">
+                        <div className="font-semibold text-gray-900">{user.successRateAll.toFixed(1)}%</div>
+                        <div className="text-xs text-gray-500">Success (All)</div>
                       </div>
-                      <div 
-                        className="cursor-pointer hover:text-gray-800 flex items-center justify-center gap-1"
-                        onClick={() => handleSort('averageAlphaClosed')}
-                      >
-                        Avg Alpha
-                        <SortIcon field="averageAlphaClosed" />
-                      </div>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedUsers.map((user, index) => (
-                  <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-25">
-                    <td className="py-3 px-2 text-sm font-medium text-gray-900">
-                      #{index + 1}
-                    </td>
-                    <td className="py-3 px-2 text-sm">
-                      <button
-                        onClick={() => handleUserClick(user.username)}
-                        className="font-medium text-blue-600 hover:text-blue-800 hover:underline"
-                      >
-                        {user.username}
-                      </button>
-                    </td>
-                    <td className="py-3 px-2 text-sm text-gray-900 text-right font-mono">
-                      {user.numberOfTrades}
-                    </td>
-                    <td className="py-3 px-2 text-sm text-center">
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="font-mono">{user.successRateAll.toFixed(1)}%</div>
-                        <div className={`font-mono ${user.averageAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {user.averageAlphaAll >= 0 ? '+' : ''}{user.averageAlphaAll.toFixed(1)}%
+                      <div className="text-center">
+                        <div className={`font-semibold ${user.avgAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {user.avgAlphaAll >= 0 ? '+' : ''}{user.avgAlphaAll.toFixed(1)}%
                         </div>
+                        <div className="text-xs text-gray-500">Alpha (All)</div>
                       </div>
-                    </td>
-                    <td className="py-3 px-2 text-sm text-center">
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="font-mono">{user.successRateClosed.toFixed(1)}%</div>
-                        <div className={`font-mono ${user.averageAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {user.averageAlphaClosed >= 0 ? '+' : ''}{user.averageAlphaClosed.toFixed(1)}%
+                      <div className="text-center">
+                        <div className="font-semibold text-gray-900">{user.successRateClosed.toFixed(1)}%</div>
+                        <div className="text-xs text-gray-500">Success (Closed)</div>
+                      </div>
+                      <div className="text-center">
+                        <div className={`font-semibold ${user.avgAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {user.avgAlphaClosed >= 0 ? '+' : ''}{user.avgAlphaClosed.toFixed(1)}%
                         </div>
+                        <div className="text-xs text-gray-500">Alpha (Closed)</div>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
