@@ -22,28 +22,37 @@ interface PerformanceProps {
 const Performance = ({ trades }: PerformanceProps) => {
   const calculateReturns = (trade: Trade) => {
     if (trade.status === 'open') {
-      return { tickerReturn: null, sp500Return: null, alpha: null };
+      // For open trades, calculate returns based on current mock price
+      const currentPrice = Math.random() * 200 + 50; // Mock current price
+      const tickerReturn = trade.side === 'buy' 
+        ? ((currentPrice - trade.entryPrice) / trade.entryPrice) * 100
+        : ((trade.entryPrice - currentPrice) / trade.entryPrice) * 100;
+      
+      const sp500Return = Math.random() * 10 - 5; // Mock S&P 500 return
+      const alpha = tickerReturn - sp500Return;
+      
+      return { tickerReturn, sp500Return, alpha };
     }
     
     const tickerReturn = trade.side === 'buy' 
       ? ((trade.exitPrice! - trade.entryPrice) / trade.entryPrice) * 100
       : ((trade.entryPrice - trade.exitPrice!) / trade.entryPrice) * 100;
     
-    // Mock S&P 500 return calculation
-    const sp500Return = Math.random() * 10 - 5; // Random between -5% to 5%
+    const sp500Return = Math.random() * 10 - 5; // Mock S&P 500 return
     const alpha = tickerReturn - sp500Return;
     
     return { tickerReturn, sp500Return, alpha };
   };
 
   const closedTrades = trades.filter(trade => trade.status === 'closed');
+  const openTrades = trades.filter(trade => trade.status === 'open');
   const successfulTrades = closedTrades.filter(trade => {
     const returns = calculateReturns(trade);
     return returns.tickerReturn! > 0;
   });
   
   const allSuccessfulTrades = trades.filter(trade => {
-    if (trade.status === 'open') return false; // Consider open trades as not successful for overall rate
+    if (trade.status === 'open') return false;
     const returns = calculateReturns(trade);
     return returns.tickerReturn! > 0;
   });
@@ -54,7 +63,7 @@ const Performance = ({ trades }: PerformanceProps) => {
     return returns.alpha!;
   });
   const averageAlphaAll = allAlphaValues.length > 0 ? allAlphaValues.reduce((sum, alpha) => sum + alpha, 0) / allAlphaValues.length : 0;
-  const averageAlphaClosed = averageAlphaAll; // Same as all since we only calculate alpha for closed trades
+  const averageAlphaClosed = averageAlphaAll;
 
   const totalTrades = trades.length;
   const successRateAll = totalTrades > 0 ? (allSuccessfulTrades.length / totalTrades) * 100 : 0;
@@ -70,7 +79,21 @@ const Performance = ({ trades }: PerformanceProps) => {
           <div className="space-y-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-900 mb-1">{totalTrades}</div>
-              <div className="text-sm text-gray-600">Number of Trades</div>
+              <div className="text-sm text-gray-600 mb-3">Number of Trades</div>
+              <div className="flex justify-center gap-6 text-sm">
+                <div>
+                  <span className="font-medium text-gray-900">{totalTrades}</span>
+                  <span className="text-gray-500 ml-1">Total</span>
+                </div>
+                <div>
+                  <span className="font-medium text-green-600">{openTrades.length}</span>
+                  <span className="text-gray-500 ml-1">Open</span>
+                </div>
+                <div>
+                  <span className="font-medium text-blue-600">{closedTrades.length}</span>
+                  <span className="text-gray-500 ml-1">Closed</span>
+                </div>
+              </div>
             </div>
             
             <div className="grid grid-cols-2 gap-8">
@@ -162,10 +185,10 @@ const Performance = ({ trades }: PerformanceProps) => {
                     const returns = calculateReturns(trade);
                     return (
                       <tr key={trade.id} className="border-b border-gray-100 hover:bg-gray-25">
-                        <td className="py-3 px-2 text-sm font-medium text-gray-900">
+                        <td className="py-3 px-2 text-sm font-medium text-gray-900 font-mono">
                           {trade.ticker}
                         </td>
-                        <td className="py-3 px-2 text-sm text-gray-600">
+                        <td className="py-3 px-2 text-sm text-gray-600 font-mono">
                           <Popover>
                             <PopoverTrigger asChild>
                               <button className="hover:text-blue-600 hover:underline text-left">
@@ -194,7 +217,7 @@ const Performance = ({ trades }: PerformanceProps) => {
                         <td className="py-3 px-2 text-sm text-gray-900 text-right font-mono">
                           ${trade.entryPrice.toFixed(2)}
                         </td>
-                        <td className="py-3 px-2 text-sm text-gray-600">
+                        <td className="py-3 px-2 text-sm text-gray-600 font-mono">
                           {trade.exitDate ? (
                             <Popover>
                               <PopoverTrigger asChild>
@@ -217,25 +240,19 @@ const Performance = ({ trades }: PerformanceProps) => {
                           {trade.exitPrice ? `$${trade.exitPrice.toFixed(2)}` : 'N/A'}
                         </td>
                         <td className="py-3 px-2 text-sm text-right font-mono">
-                          {returns.tickerReturn !== null ? (
-                            <span className={returns.tickerReturn >= 0 ? 'text-green-600' : 'text-red-600'}>
-                              {returns.tickerReturn.toFixed(2)}%
-                            </span>
-                          ) : 'N/A'}
+                          <span className={returns.tickerReturn >= 0 ? 'text-green-600' : 'text-red-600'}>
+                            {returns.tickerReturn.toFixed(2)}%
+                          </span>
                         </td>
                         <td className="py-3 px-2 text-sm text-right font-mono">
-                          {returns.sp500Return !== null ? (
-                            <span className={returns.sp500Return >= 0 ? 'text-green-600' : 'text-red-600'}>
-                              {returns.sp500Return.toFixed(2)}%
-                            </span>
-                          ) : 'N/A'}
+                          <span className={returns.sp500Return >= 0 ? 'text-green-600' : 'text-red-600'}>
+                            {returns.sp500Return.toFixed(2)}%
+                          </span>
                         </td>
                         <td className="py-3 px-2 text-sm text-right font-mono font-semibold">
-                          {returns.alpha !== null ? (
-                            <span className={returns.alpha >= 0 ? 'text-green-600' : 'text-red-600'}>
-                              {returns.alpha.toFixed(2)}%
-                            </span>
-                          ) : 'N/A'}
+                          <span className={returns.alpha >= 0 ? 'text-green-600' : 'text-red-600'}>
+                            {returns.alpha.toFixed(2)}%
+                          </span>
                         </td>
                       </tr>
                     );
