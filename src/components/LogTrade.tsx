@@ -13,21 +13,21 @@ interface Trade {
   side: 'buy' | 'sell';
   entryPrice: number;
   entryDate: Date;
-  reasoning: string;
+  reason: string;
   status: 'open' | 'closed';
 }
 
 interface LogTradeProps {
   trades: Trade[];
   onAddTrade: (trade: Omit<Trade, 'id'>) => void;
-  onCloseTrade: (tradeId: string, reasoning: string) => void;
+  onCloseTrade: (tradeId: string, reason: string) => void;
 }
 
 const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
   const [tradeType, setTradeType] = useState<'open' | 'close'>('open');
   const [ticker, setTicker] = useState('');
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
-  const [reasoning, setReasoning] = useState('');
+  const [reason, setReason] = useState('');
   const [selectedTradeId, setSelectedTradeId] = useState('');
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,31 +53,31 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
   };
 
   const handleOpenTrade = () => {
-    if (!ticker || !reasoning.trim() || !currentPrice) return;
+    if (!ticker || !reason.trim() || !currentPrice) return;
     
     onAddTrade({
       ticker: ticker.toUpperCase(),
       side,
       entryPrice: currentPrice,
       entryDate: new Date(),
-      reasoning: reasoning.trim(),
+      reason: reason.trim(),
       status: 'open'
     });
 
     // Reset form
     setTicker('');
-    setReasoning('');
+    setReason('');
     setCurrentPrice(null);
   };
 
   const handleCloseTrade = () => {
-    if (!selectedTradeId || !reasoning.trim()) return;
+    if (!selectedTradeId || !reason.trim()) return;
     
-    onCloseTrade(selectedTradeId, reasoning.trim());
+    onCloseTrade(selectedTradeId, reason.trim());
     
     // Reset form
     setSelectedTradeId('');
-    setReasoning('');
+    setReason('');
   };
 
   return (
@@ -173,20 +173,20 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="reasoning" className="text-sm font-medium text-gray-700">
-              Reasoning
+            <Label htmlFor="reason" className="text-sm font-medium text-gray-700">
+              Reason
             </Label>
             <Textarea
-              id="reasoning"
+              id="reason"
               placeholder="Explain your rationale for this trade..."
-              value={reasoning}
-              onChange={(e) => setReasoning(e.target.value)}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
               maxLength={300}
               className="text-sm resize-none"
               rows={4}
             />
             <p className="text-xs text-gray-500">
-              {reasoning.length}/300 characters
+              {reason.length}/300 characters
             </p>
           </div>
           
@@ -194,8 +194,8 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
             onClick={tradeType === 'open' ? handleOpenTrade : handleCloseTrade}
             disabled={
               tradeType === 'open' 
-                ? !ticker || !reasoning.trim() || !currentPrice 
-                : !selectedTradeId || !reasoning.trim()
+                ? !ticker || !reason.trim() || !currentPrice 
+                : !selectedTradeId || !reason.trim()
             }
             className="w-full text-sm"
           >

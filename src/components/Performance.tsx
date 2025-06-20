@@ -8,11 +8,11 @@ interface Trade {
   side: 'buy' | 'sell';
   entryPrice: number;
   entryDate: Date;
-  reasoning: string;
+  reason: string;
   status: 'open' | 'closed';
   exitPrice?: number;
   exitDate?: Date;
-  closeReasoning?: string;
+  closeReason?: string;
 }
 
 interface PerformanceProps {
@@ -98,9 +98,9 @@ const Performance = ({ trades }: PerformanceProps) => {
                             </PopoverTrigger>
                             <PopoverContent className="w-80 max-h-40 overflow-y-auto">
                               <div className="space-y-2">
-                                <h4 className="font-medium text-sm">Entry Reasoning</h4>
+                                <h4 className="font-medium text-sm">Entry Reason</h4>
                                 <p className="text-xs text-gray-600 whitespace-pre-wrap">
-                                  {trade.reasoning}
+                                  {trade.reason}
                                 </p>
                               </div>
                             </PopoverContent>
@@ -128,9 +128,9 @@ const Performance = ({ trades }: PerformanceProps) => {
                               </PopoverTrigger>
                               <PopoverContent className="w-80 max-h-40 overflow-y-auto">
                                 <div className="space-y-2">
-                                  <h4 className="font-medium text-sm">Close Reasoning</h4>
+                                  <h4 className="font-medium text-sm">Close Reason</h4>
                                   <p className="text-xs text-gray-600 whitespace-pre-wrap">
-                                    {trade.closeReasoning || 'No reasoning provided'}
+                                    {trade.closeReason || 'No reason provided'}
                                   </p>
                                 </div>
                               </PopoverContent>

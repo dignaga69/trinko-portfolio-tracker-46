@@ -11,11 +11,11 @@ interface Trade {
   side: 'buy' | 'sell';
   entryPrice: number;
   entryDate: Date;
-  reasoning: string;
+  reason: string;
   status: 'open' | 'closed';
   exitPrice?: number;
   exitDate?: Date;
-  closeReasoning?: string;
+  closeReason?: string;
 }
 
 const Index = () => {
@@ -30,7 +30,7 @@ const Index = () => {
     setTrades(prev => [...prev, trade]);
   };
 
-  const handleCloseTrade = (tradeId: string, closeReasoning: string) => {
+  const handleCloseTrade = (tradeId: string, closeReason: string) => {
     setTrades(prev => prev.map(trade => {
       if (trade.id === tradeId) {
         // Simulate fetching current price for exit
@@ -40,7 +40,7 @@ const Index = () => {
           status: 'closed' as const,
           exitPrice,
           exitDate: new Date(),
-          closeReasoning
+          closeReason
         };
       }
       return trade;
