@@ -1,10 +1,8 @@
-
 import { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import LogTrade from '@/components/LogTrade';
 import Performance from '@/components/Performance';
 import Community from '@/components/Community';
-import Profile from '@/components/Profile';
 
 interface Trade {
   id: string;
@@ -62,8 +60,6 @@ const Index = () => {
         return <Performance trades={trades} />;
       case 'community':
         return <Community />;
-      case 'profile':
-        return <Profile isOwnProfile={true} />;
       default:
         return <LogTrade trades={trades} onAddTrade={handleAddTrade} onCloseTrade={handleCloseTrade} />;
     }

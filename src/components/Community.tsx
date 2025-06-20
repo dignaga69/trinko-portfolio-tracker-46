@@ -1,8 +1,9 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
 interface LeaderboardUser {
@@ -18,7 +19,8 @@ interface LeaderboardUser {
 const Community = () => {
   const [sortField, setSortField] = useState<keyof LeaderboardUser>('averageAlphaAll');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [filters, setFilters] = useState({
+  const [filterDialogOpen, setFilterDialogOpen] = useState<string | null>(null);
+  const [filterValues, setFilterValues] = useState({
     numberOfTrades: { min: '', max: '' },
     successRateAll: { min: '', max: '' },
     averageAlphaAll: { min: '', max: '' },
@@ -89,6 +91,18 @@ const Community = () => {
     // This would navigate to the user's profile page
   };
 
+  const handleFilterApply = (filterType: string) => {
+    console.log(`Applying filter for ${filterType}:`, filterValues[filterType as keyof typeof filterValues]);
+    setFilterDialogOpen(null);
+  };
+
+  const handleFilterClear = (filterType: string) => {
+    setFilterValues(prev => ({
+      ...prev,
+      [filterType]: { min: '', max: '' }
+    }));
+  };
+
   const sortedUsers = [...mockUsers].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
@@ -101,139 +115,73 @@ const Community = () => {
     return sortDirection === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
   };
 
+  const FilterDialog = ({ filterType, label }: { filterType: string; label: string }) => (
+    <Dialog open={filterDialogOpen === filterType} onOpenChange={(open) => setFilterDialogOpen(open ? filterType : null)}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="text-xs">
+          {label}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[400px]">
+        <DialogHeader>
+          <DialogTitle>{label}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="min-value" className="text-sm">Minimum</Label>
+              <Input
+                id="min-value"
+                placeholder="Min"
+                value={filterValues[filterType as keyof typeof filterValues].min}
+                onChange={(e) => setFilterValues(prev => ({
+                  ...prev,
+                  [filterType]: { ...prev[filterType as keyof typeof filterValues], min: e.target.value }
+                }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="max-value" className="text-sm">Maximum</Label>
+              <Input
+                id="max-value"
+                placeholder="Max"
+                value={filterValues[filterType as keyof typeof filterValues].max}
+                onChange={(e) => setFilterValues(prev => ({
+                  ...prev,
+                  [filterType]: { ...prev[filterType as keyof typeof filterValues], max: e.target.value }
+                }))}
+              />
+            </div>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => handleFilterClear(filterType)}>
+              Clear
+            </Button>
+            <Button onClick={() => handleFilterApply(filterType)}>
+              Apply
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   return (
     <div className="space-y-6">
       <Card className="border-0 shadow-none bg-gray-50">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Leaderboard</CardTitle>
-          <div className="text-sm text-gray-600">
-            Top performers with 5+ trades ranked by performance
-          </div>
         </CardHeader>
         <CardContent>
           {/* Filters Section */}
           <div className="mb-6 p-4 bg-white rounded-lg border">
             <h4 className="text-sm font-semibold text-gray-700 mb-3">Filters</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              <div>
-                <label className="text-xs font-medium text-gray-600 mb-1 block">Number of Trades</label>
-                <div className="flex gap-1">
-                  <Input
-                    placeholder="Min"
-                    className="text-xs h-8"
-                    value={filters.numberOfTrades.min}
-                    onChange={(e) => setFilters(prev => ({
-                      ...prev,
-                      numberOfTrades: { ...prev.numberOfTrades, min: e.target.value }
-                    }))}
-                  />
-                  <Input
-                    placeholder="Max"
-                    className="text-xs h-8"
-                    value={filters.numberOfTrades.max}
-                    onChange={(e) => setFilters(prev => ({
-                      ...prev,
-                      numberOfTrades: { ...prev.numberOfTrades, max: e.target.value }
-                    }))}
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-600 mb-1 block">Success Rate (All)</label>
-                <div className="flex gap-1">
-                  <Input
-                    placeholder="Min %"
-                    className="text-xs h-8"
-                    value={filters.successRateAll.min}
-                    onChange={(e) => setFilters(prev => ({
-                      ...prev,
-                      successRateAll: { ...prev.successRateAll, min: e.target.value }
-                    }))}
-                  />
-                  <Input
-                    placeholder="Max %"
-                    className="text-xs h-8"
-                    value={filters.successRateAll.max}
-                    onChange={(e) => setFilters(prev => ({
-                      ...prev,
-                      successRateAll: { ...prev.successRateAll, max: e.target.value }
-                    }))}
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-600 mb-1 block">Avg Alpha (All)</label>
-                <div className="flex gap-1">
-                  <Input
-                    placeholder="Min %"
-                    className="text-xs h-8"
-                    value={filters.averageAlphaAll.min}
-                    onChange={(e) => setFilters(prev => ({
-                      ...prev,
-                      averageAlphaAll: { ...prev.averageAlphaAll, min: e.target.value }
-                    }))}
-                  />
-                  <Input
-                    placeholder="Max %"
-                    className="text-xs h-8"
-                    value={filters.averageAlphaAll.max}
-                    onChange={(e) => setFilters(prev => ({
-                      ...prev,
-                      averageAlphaAll: { ...prev.averageAlphaAll, max: e.target.value }
-                    }))}
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-600 mb-1 block">Success Rate (Closed)</label>
-                <div className="flex gap-1">
-                  <Input
-                    placeholder="Min %"
-                    className="text-xs h-8"
-                    value={filters.successRateClosed.min}
-                    onChange={(e) => setFilters(prev => ({
-                      ...prev,
-                      successRateClosed: { ...prev.successRateClosed, min: e.target.value }
-                    }))}
-                  />
-                  <Input
-                    placeholder="Max %"
-                    className="text-xs h-8"
-                    value={filters.successRateClosed.max}
-                    onChange={(e) => setFilters(prev => ({
-                      ...prev,
-                      successRateClosed: { ...prev.successRateClosed, max: e.target.value }
-                    }))}
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-600 mb-1 block">Avg Alpha (Closed)</label>
-                <div className="flex gap-1">
-                  <Input
-                    placeholder="Min %"
-                    className="text-xs h-8"
-                    value={filters.averageAlphaClosed.min}
-                    onChange={(e) => setFilters(prev => ({
-                      ...prev,
-                      averageAlphaClosed: { ...prev.averageAlphaClosed, min: e.target.value }
-                    }))}
-                  />
-                  <Input
-                    placeholder="Max %"
-                    className="text-xs h-8"
-                    value={filters.averageAlphaClosed.max}
-                    onChange={(e) => setFilters(prev => ({
-                      ...prev,
-                      averageAlphaClosed: { ...prev.averageAlphaClosed, max: e.target.value }
-                    }))}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="mt-3 flex gap-2">
-              <Button size="sm" variant="outline">Apply Filters</Button>
-              <Button size="sm" variant="ghost">Clear All</Button>
+            <div className="flex flex-wrap gap-2">
+              <FilterDialog filterType="numberOfTrades" label="Number of Trades" />
+              <FilterDialog filterType="successRateAll" label="Success Rate (All)" />
+              <FilterDialog filterType="averageAlphaAll" label="Average Alpha (All)" />
+              <FilterDialog filterType="successRateClosed" label="Success Rate (Closed)" />
+              <FilterDialog filterType="averageAlphaClosed" label="Average Alpha (Closed)" />
             </div>
           </div>
 

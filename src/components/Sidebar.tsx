@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -24,8 +23,7 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
   const menuItems = [
     { id: 'log-trade', label: 'Log Trade' },
     { id: 'performance', label: 'Performance' },
-    { id: 'community', label: 'Community' },
-    ...(isLoggedIn ? [{ id: 'profile', label: 'Profile' }] : [])
+    { id: 'community', label: 'Community' }
   ];
 
   const handleLogin = (e: React.FormEvent) => {

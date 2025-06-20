@@ -1,6 +1,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Edit2, Twitter, Linkedin } from 'lucide-react';
 
 interface Trade {
   id: string;
@@ -71,32 +74,72 @@ const Performance = ({ trades }: PerformanceProps) => {
 
   return (
     <div className="space-y-6">
+      {/* Profile Section */}
+      <Card className="border-0 shadow-none bg-gray-50">
+        <CardContent className="pt-6">
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <Avatar className="w-16 h-16">
+                <AvatarImage src="" />
+                <AvatarFallback className="text-lg font-semibold">TG</AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">TradeGuru</h2>
+                <p className="text-sm text-gray-600">Member since January 2023</p>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" className="gap-2">
+              <Edit2 className="w-4 h-4" />
+              Edit Profile
+            </Button>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">Bio</h4>
+              <p className="text-sm text-gray-600">
+                Passionate trader focused on value investing and long-term growth strategies. 5+ years of market experience.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">Social Links</h4>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="w-10 h-10 p-0">
+                  <Twitter className="w-4 h-4" />
+                </Button>
+                <Button variant="outline" size="sm" className="w-10 h-10 p-0">
+                  <Linkedin className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card className="border-0 shadow-none bg-gray-50">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Overview</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900 mb-1">{totalTrades}</div>
-              <div className="text-sm text-gray-600 mb-3">Number of Trades</div>
-              <div className="flex justify-center gap-6 text-sm">
-                <div>
-                  <span className="font-medium text-gray-900">{totalTrades}</span>
-                  <span className="text-gray-500 ml-1">Total</span>
+            <div className="grid grid-cols-3 gap-8">
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-gray-700 text-center border-b border-gray-200 pb-2">Number of Trades</h4>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-gray-900">{totalTrades}</div>
+                  <div className="text-xs text-gray-600">Total</div>
                 </div>
-                <div>
-                  <span className="font-medium text-green-600">{openTrades.length}</span>
-                  <span className="text-gray-500 ml-1">Open</span>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-green-600">{openTrades.length}</div>
+                  <div className="text-xs text-gray-600">Open</div>
                 </div>
-                <div>
-                  <span className="font-medium text-blue-600">{closedTrades.length}</span>
-                  <span className="text-gray-500 ml-1">Closed</span>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-blue-600">{closedTrades.length}</div>
+                  <div className="text-xs text-gray-600">Closed</div>
                 </div>
               </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-8">
+              
               <div className="space-y-4">
                 <h4 className="text-sm font-semibold text-gray-700 text-center border-b border-gray-200 pb-2">All Trades</h4>
                 <div className="text-center">
