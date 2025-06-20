@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
@@ -47,6 +48,14 @@ const Performance = ({ trades }: PerformanceProps) => {
     return returns.tickerReturn! > 0;
   });
 
+  // Calculate average alpha for all trades (only closed trades have alpha values)
+  const allAlphaValues = closedTrades.map(trade => {
+    const returns = calculateReturns(trade);
+    return returns.alpha!;
+  });
+  const averageAlphaAll = allAlphaValues.length > 0 ? allAlphaValues.reduce((sum, alpha) => sum + alpha, 0) / allAlphaValues.length : 0;
+  const averageAlphaClosed = averageAlphaAll; // Same as all since we only calculate alpha for closed trades
+
   const totalTrades = trades.length;
   const successRateAll = totalTrades > 0 ? (allSuccessfulTrades.length / totalTrades) * 100 : 0;
   const successRateClosed = closedTrades.length > 0 ? (successfulTrades.length / closedTrades.length) * 100 : 0;
@@ -55,21 +64,51 @@ const Performance = ({ trades }: PerformanceProps) => {
     <div className="space-y-6">
       <Card className="border-0 shadow-none bg-gray-50">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">Statistics</CardTitle>
+          <CardTitle className="text-lg font-semibold">Overview</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-8">
+          <div className="space-y-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">{totalTrades}</div>
+              <div className="text-2xl font-bold text-gray-900 mb-1">{totalTrades}</div>
               <div className="text-sm text-gray-600">Number of Trades</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">{successRateAll.toFixed(1)}%</div>
-              <div className="text-sm text-gray-600">Success Rate (All)</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">{successRateClosed.toFixed(1)}%</div>
-              <div className="text-sm text-gray-600">Success Rate (Closed Only)</div>
+            
+            <div className="grid grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-gray-700 text-center border-b border-gray-200 pb-2">All Trades</h4>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-gray-900">{successRateAll.toFixed(1)}%</div>
+                  <div className="text-xs text-gray-600">Success Rate</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-gray-900">
+                    {closedTrades.length > 0 ? (
+                      <span className={averageAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'}>
+                        {averageAlphaAll >= 0 ? '+' : ''}{averageAlphaAll.toFixed(2)}%
+                      </span>
+                    ) : 'N/A'}
+                  </div>
+                  <div className="text-xs text-gray-600">Average Alpha</div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-gray-700 text-center border-b border-gray-200 pb-2">Closed Only</h4>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-gray-900">{successRateClosed.toFixed(1)}%</div>
+                  <div className="text-xs text-gray-600">Success Rate</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-gray-900">
+                    {closedTrades.length > 0 ? (
+                      <span className={averageAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'}>
+                        {averageAlphaClosed >= 0 ? '+' : ''}{averageAlphaClosed.toFixed(2)}%
+                      </span>
+                    ) : 'N/A'}
+                  </div>
+                  <div className="text-xs text-gray-600">Average Alpha</div>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>
