@@ -68,7 +68,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-purple-50 to-slate-200 flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Center the entire app with max width and horizontal margins */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-8 py-8">
         <div className="flex">
