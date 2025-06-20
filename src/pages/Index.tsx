@@ -68,18 +68,21 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <div className="flex flex-1">
-        <Sidebar 
-          activeSection={activeSection}
-          onSectionChange={setActiveSection}
-        />
-        
-        <main className="flex-1 ml-64 px-8 py-8">
-          <div className="max-w-6xl mx-auto">
-            {renderContent()}
-          </div>
-        </main>
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-purple-50 to-slate-200 flex flex-col">
+      {/* Center the entire app with max width and horizontal margins */}
+      <div className="flex-1 max-w-7xl mx-auto w-full px-8 py-8">
+        <div className="flex">
+          <Sidebar 
+            activeSection={activeSection}
+            onSectionChange={setActiveSection}
+          />
+          
+          <main className="flex-1 ml-8">
+            <div className="max-w-4xl">
+              {renderContent()}
+            </div>
+          </main>
+        </div>
       </div>
       
       <Footer />

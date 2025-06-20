@@ -24,7 +24,6 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login - in real app, this would authenticate with backend
     console.log('Login attempted:', loginForm);
     setIsLoggedIn(true);
     setLoginForm({ email: '', password: '' });
@@ -35,8 +34,8 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
   };
 
   return (
-    <div className="w-64 h-screen bg-white border-r border-gray-100 p-8 fixed left-0 top-0 flex flex-col">
-      <div className="mb-12">
+    <div className="w-64 bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl p-6 flex flex-col shadow-lg h-fit">
+      <div className="mb-8">
         <h1 className="text-2xl font-black text-gray-900 tracking-tight">TRINKO</h1>
       </div>
       
@@ -48,8 +47,8 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
             className={cn(
               "block w-full text-left px-4 py-3 text-sm font-medium rounded-lg transition-colors",
               activeSection === item.id
-                ? "bg-gray-50 text-gray-900"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-25"
+                ? "bg-purple-100/70 text-purple-900 shadow-sm"
+                : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
             )}
           >
             {item.label}
@@ -57,7 +56,7 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
         ))}
       </nav>
 
-      <div className="mt-auto pt-6 border-t border-gray-100">
+      <div className="mt-8 pt-6 border-t border-gray-200/50">
         {isLoggedIn ? (
           <div className="space-y-3">
             <div className="text-sm text-gray-600 text-center">
@@ -65,7 +64,7 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
             </div>
             <Button 
               variant="outline" 
-              className="w-full text-sm"
+              className="w-full text-sm border-gray-300 hover:bg-white/70"
               onClick={handleLogout}
             >
               Sign Out
@@ -75,7 +74,7 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
           <div className="space-y-3">
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="w-full text-sm bg-gray-900 hover:bg-gray-800 text-white">
+                <Button className="w-full text-sm bg-purple-600 hover:bg-purple-700 text-white">
                   Sign In
                 </Button>
               </DialogTrigger>
@@ -120,7 +119,7 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
                     
                     <Button 
                       type="submit" 
-                      className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-lg text-base"
+                      className="w-full h-12 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg text-base"
                     >
                       Sign In
                     </Button>
