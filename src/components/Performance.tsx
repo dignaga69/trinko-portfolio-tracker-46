@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
@@ -36,8 +35,46 @@ const Performance = ({ trades }: PerformanceProps) => {
     return { tickerReturn, sp500Return, alpha };
   };
 
+  const closedTrades = trades.filter(trade => trade.status === 'closed');
+  const successfulTrades = closedTrades.filter(trade => {
+    const returns = calculateReturns(trade);
+    return returns.tickerReturn! > 0;
+  });
+  
+  const allSuccessfulTrades = trades.filter(trade => {
+    if (trade.status === 'open') return false; // Consider open trades as not successful for overall rate
+    const returns = calculateReturns(trade);
+    return returns.tickerReturn! > 0;
+  });
+
+  const totalTrades = trades.length;
+  const successRateAll = totalTrades > 0 ? (allSuccessfulTrades.length / totalTrades) * 100 : 0;
+  const successRateClosed = closedTrades.length > 0 ? (successfulTrades.length / closedTrades.length) * 100 : 0;
+
   return (
     <div className="space-y-6">
+      <Card className="border-0 shadow-none bg-gray-50">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Statistics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-900">{totalTrades}</div>
+              <div className="text-sm text-gray-600">Number of Trades</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-900">{successRateAll.toFixed(1)}%</div>
+              <div className="text-sm text-gray-600">Success Rate (All)</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-900">{successRateClosed.toFixed(1)}%</div>
+              <div className="text-sm text-gray-600">Success Rate (Closed Only)</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card className="border-0 shadow-none bg-gray-50">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Trade History</CardTitle>
