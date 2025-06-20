@@ -1,5 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface Trade {
   id: string;
@@ -89,7 +90,21 @@ const Performance = ({ trades }: PerformanceProps) => {
                           {trade.ticker}
                         </td>
                         <td className="py-3 px-2 text-sm text-gray-600">
-                          {trade.entryDate.toLocaleDateString()}
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button className="hover:text-blue-600 hover:underline text-left">
+                                {trade.entryDate.toLocaleDateString()}
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80 max-h-40 overflow-y-auto">
+                              <div className="space-y-2">
+                                <h4 className="font-medium text-sm">Entry Reasoning</h4>
+                                <p className="text-xs text-gray-600 whitespace-pre-wrap">
+                                  {trade.reasoning}
+                                </p>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
                         </td>
                         <td className="py-3 px-2 text-sm">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -104,7 +119,23 @@ const Performance = ({ trades }: PerformanceProps) => {
                           ${trade.entryPrice.toFixed(2)}
                         </td>
                         <td className="py-3 px-2 text-sm text-gray-600">
-                          {trade.exitDate ? trade.exitDate.toLocaleDateString() : 'N/A'}
+                          {trade.exitDate ? (
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button className="hover:text-blue-600 hover:underline text-left">
+                                  {trade.exitDate.toLocaleDateString()}
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-80 max-h-40 overflow-y-auto">
+                                <div className="space-y-2">
+                                  <h4 className="font-medium text-sm">Close Reasoning</h4>
+                                  <p className="text-xs text-gray-600 whitespace-pre-wrap">
+                                    {trade.closeReasoning || 'No reasoning provided'}
+                                  </p>
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                          ) : 'N/A'}
                         </td>
                         <td className="py-3 px-2 text-sm text-gray-900 text-right font-mono">
                           {trade.exitPrice ? `$${trade.exitPrice.toFixed(2)}` : 'N/A'}

@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 interface SidebarProps {
   activeSection: string;
@@ -15,12 +16,12 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
   ];
 
   return (
-    <div className="w-64 h-screen bg-white border-r border-gray-100 p-8 fixed left-0 top-0">
+    <div className="w-64 h-screen bg-white border-r border-gray-100 p-8 fixed left-0 top-0 flex flex-col">
       <div className="mb-12">
         <h1 className="text-2xl font-black text-gray-900 tracking-tight">TRINKO</h1>
       </div>
       
-      <nav className="space-y-2">
+      <nav className="space-y-2 flex-1">
         {menuItems.map((item) => (
           <button
             key={item.id}
@@ -36,6 +37,17 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
           </button>
         ))}
       </nav>
+
+      <div className="mt-auto pt-6 border-t border-gray-100">
+        <div className="space-y-3">
+          <Button variant="outline" className="w-full text-sm">
+            Sign In
+          </Button>
+          <Button className="w-full text-sm">
+            Sign Up
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

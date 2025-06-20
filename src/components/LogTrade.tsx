@@ -181,12 +181,12 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
               placeholder="Explain your rationale for this trade..."
               value={reasoning}
               onChange={(e) => setReasoning(e.target.value)}
-              maxLength={100}
+              maxLength={300}
               className="text-sm resize-none"
-              rows={3}
+              rows={4}
             />
             <p className="text-xs text-gray-500">
-              {reasoning.length}/100 characters
+              {reasoning.length}/300 characters
             </p>
           </div>
           
