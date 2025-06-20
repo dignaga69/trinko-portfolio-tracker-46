@@ -1,12 +1,83 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from 'react';
+import Sidebar from '@/components/Sidebar';
+import LogTrade from '@/components/LogTrade';
+import Performance from '@/components/Performance';
+import Community from '@/components/Community';
+
+interface Trade {
+  id: string;
+  ticker: string;
+  side: 'buy' | 'sell';
+  entryPrice: number;
+  entryDate: Date;
+  reasoning: string;
+  status: 'open' | 'closed';
+  exitPrice?: number;
+  exitDate?: Date;
+  closeReasoning?: string;
+}
 
 const Index = () => {
+  const [activeSection, setActiveSection] = useState('log-trade');
+  const [trades, setTrades] = useState<Trade[]>([]);
+
+  const handleAddTrade = (newTrade: Omit<Trade, 'id'>) => {
+    const trade: Trade = {
+      ...newTrade,
+      id: Date.now().toString(),
+    };
+    setTrades(prev => [...prev, trade]);
+  };
+
+  const handleCloseTrade = (tradeId: string, closeReasoning: string) => {
+    setTrades(prev => prev.map(trade => {
+      if (trade.id === tradeId) {
+        // Simulate fetching current price for exit
+        const exitPrice = Math.random() * 200 + 50;
+        return {
+          ...trade,
+          status: 'closed' as const,
+          exitPrice,
+          exitDate: new Date(),
+          closeReasoning
+        };
+      }
+      return trade;
+    }));
+  };
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'log-trade':
+        return (
+          <LogTrade 
+            trades={trades}
+            onAddTrade={handleAddTrade}
+            onCloseTrade={handleCloseTrade}
+          />
+        );
+      case 'performance':
+        return <Performance trades={trades} />;
+      case 'community':
+        return <Community />;
+      default:
+        return <LogTrade trades={trades} onAddTrade={handleAddTrade} onCloseTrade={handleCloseTrade} />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-white">
+      <Sidebar 
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+      />
+      
+      <main className="ml-64 p-8">
+        <div className="max-w-4xl">
+          {renderContent()}
+        </div>
+      </main>
     </div>
   );
 };
