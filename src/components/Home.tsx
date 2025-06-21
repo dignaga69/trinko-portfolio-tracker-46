@@ -27,33 +27,6 @@ const Home = () => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-6">
-        
-              <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Your Performance</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {user ? (
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <p className="text-2xl font-bold text-green-600">$0</p>
-                <p className="text-sm text-gray-600">Total P&L</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold">0</p>
-                <p className="text-sm text-gray-600">Total Trades</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold">0%</p>
-                <p className="text-sm text-gray-600">Win Rate</p>
-              </div>
-            </div>
-          ) : (
-            <p className="text-center text-gray-500">Sign in to view your performance</p>
-          )}
-        </CardContent>
-      </Card>
-        
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-semibold">Trending Pros</CardTitle>
@@ -112,6 +85,31 @@ const Home = () => {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Your Performance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {user ? (
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-2xl font-bold text-green-600">$0</p>
+                <p className="text-sm text-gray-600">Total P&L</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold">0</p>
+                <p className="text-sm text-gray-600">Total Trades</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold">0%</p>
+                <p className="text-sm text-gray-600">Win Rate</p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-center text-gray-500">Sign in to view your performance</p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
