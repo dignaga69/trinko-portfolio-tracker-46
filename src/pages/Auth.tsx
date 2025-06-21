@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -101,7 +100,7 @@ const Auth = () => {
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-0 shadow-lg">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-black tracking-tight" style={{ fontFamily: 'Monaco, monospace' }}>
+          <CardTitle className="text-3xl font-black tracking-tight">
             TRINKO
           </CardTitle>
           <CardDescription>Your personal trading journal</CardDescription>
