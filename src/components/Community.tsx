@@ -223,6 +223,9 @@ const Community = () => {
       <Card className="border-0 shadow-none bg-gray-50">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Leaderboard</CardTitle>
+          <p className="text-sm italic text-gray-600 mt-2">
+            The best shot-callers.
+          </p>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
@@ -308,6 +311,9 @@ const Community = () => {
       <Card className="border-0 shadow-none bg-gray-50">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Best Trades</CardTitle>
+          <p className="text-sm italic text-gray-600 mt-2">
+            The best calls for each timeframe.
+          </p>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">

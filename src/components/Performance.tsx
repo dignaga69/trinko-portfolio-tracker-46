@@ -120,6 +120,9 @@ const Performance = ({ trades }: PerformanceProps) => {
       <Card className="border-0 shadow-none bg-gray-50">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Overview</CardTitle>
+          <p className="text-sm italic text-gray-600 mt-2">
+            Your basic stats at a glance.
+          </p>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">

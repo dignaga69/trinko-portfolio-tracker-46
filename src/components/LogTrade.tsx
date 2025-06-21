@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -110,6 +109,17 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
           <CardTitle className="text-lg font-semibold">
             {tradeType === 'open' ? 'Open New Position' : 'Close Existing Position'}
           </CardTitle>
+          <p className="text-sm italic text-gray-600 mt-2">
+            {tradeType === 'open' ? (
+              <>
+                Log a new position. <span className="text-red-600">This action is permanent, and cannot be undone or deleted.</span>
+              </>
+            ) : (
+              <>
+                Close a position. <span className="text-red-600">This action is permanent, and cannot be undone or deleted.</span>
+              </>
+            )}
+          </p>
         </CardHeader>
         <CardContent className="space-y-6">
           {tradeType === 'open' ? (
