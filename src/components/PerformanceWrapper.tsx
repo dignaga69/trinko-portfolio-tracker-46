@@ -2,6 +2,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { BarChart3 } from 'lucide-react';
 import Performance from './Performance';
 
 interface Trade {
@@ -27,12 +28,13 @@ const PerformanceWrapper = ({ trades }: PerformanceWrapperProps) => {
   if (!user) {
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold">Performance</h2>
-          <p className="text-sm italic text-gray-600 mt-2">
-            Sign in to view your performance.
-          </p>
+        <div className="flex items-center gap-3">
+          <BarChart3 size={24} />
+          <h1 className="text-2xl font-bold">Performance</h1>
         </div>
+        <p className="text-sm italic text-gray-600">
+          Sign in to view your performance.
+        </p>
         <Card className="bg-gray-50">
           <CardContent className="p-8 text-center">
             <p className="text-gray-600 mb-4">Please sign in to view your trading performance</p>
@@ -45,7 +47,15 @@ const PerformanceWrapper = ({ trades }: PerformanceWrapperProps) => {
     );
   }
 
-  return <Performance trades={trades} />;
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <BarChart3 size={24} />
+        <h1 className="text-2xl font-bold">Performance</h1>
+      </div>
+      <Performance trades={trades} />
+    </div>
+  );
 };
 
 export default PerformanceWrapper;

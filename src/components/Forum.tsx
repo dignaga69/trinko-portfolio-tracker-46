@@ -1,4 +1,3 @@
-
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,19 +44,19 @@ const Forum = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">Forum</h2>
-          <p className="text-sm italic text-gray-600 mt-2">
-            Join the community discussions.
-          </p>
-        </div>
-        {user && (
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-            Create New Post
-          </Button>
-        )}
+      <div className="flex items-center gap-3">
+        <MessageSquare size={24} />
+        <h1 className="text-2xl font-bold">Forum</h1>
       </div>
+      <p className="text-sm italic text-gray-600">
+        Join the community discussions.
+      </p>
+
+      {user && (
+        <Button className="bg-orange-500 hover:bg-orange-600 text-white">
+          Create New Post
+        </Button>
+      )}
 
       <div className="space-y-4">
         {forumPosts.map((post) => (
