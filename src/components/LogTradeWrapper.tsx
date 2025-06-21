@@ -2,7 +2,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText } from 'lucide-react';
 import LogTrade from './LogTrade';
 
 interface Trade {
@@ -30,13 +29,8 @@ const LogTradeWrapper = ({ trades, onAddTrade, onCloseTrade }: LogTradeWrapperPr
   if (!user) {
     return (
       <div className="space-y-6">
-        {/* Page Heading */}
-        <div className="flex items-center gap-3 mb-8">
-          <FileText size={24} className="text-gray-700" />
-          <h1 className="text-2xl font-bold text-gray-900">Log Trade</h1>
-        </div>
-        
         <div>
+          <h2 className="text-2xl font-bold">Log Trade</h2>
           <p className="text-sm italic text-gray-600 mt-2">
             Sign in to log your trades.
           </p>
@@ -53,17 +47,7 @@ const LogTradeWrapper = ({ trades, onAddTrade, onCloseTrade }: LogTradeWrapperPr
     );
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Page Heading */}
-      <div className="flex items-center gap-3 mb-8">
-        <FileText size={24} className="text-gray-700" />
-        <h1 className="text-2xl font-bold text-gray-900">Log Trade</h1>
-      </div>
-      
-      <LogTrade trades={trades} onAddTrade={onAddTrade} onCloseTrade={onCloseTrade} />
-    </div>
-  );
+  return <LogTrade trades={trades} onAddTrade={onAddTrade} onCloseTrade={onCloseTrade} />;
 };
 
 export default LogTradeWrapper;
