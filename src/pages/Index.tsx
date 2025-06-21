@@ -103,7 +103,7 @@ const Index = () => {
           />
           
           <main className="flex-1 ml-8">
-            <div className="max-w-4xl">
+            <div className="max-w-4xl mt-16">
               {renderContent()}
             </div>
           </main>

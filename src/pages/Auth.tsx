@@ -79,7 +79,7 @@ const Auth = () => {
 
     setRegisterLoading(true);
     try {
-      await signUp(registerEmail, registerPassword, fullName);
+      await signUp(registerEmail, registerPassword, { full_name: fullName });
       toast({
         title: "Account Created!",
         description: "Welcome to your trading journal. You've been automatically signed in.",
