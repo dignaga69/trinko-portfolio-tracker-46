@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -137,11 +136,11 @@ const Auth = () => {
     signUpForm.password === signUpForm.confirmPassword;
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-8">
+    <div className="min-h-screen bg-white flex items-center justify-center p-8" style={{ fontFamily: 'Monaco, monospace' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-2">TRINKO</h1>
-          <p className="text-gray-600">Welcome back to your trading journal</p>
+          <p className="text-gray-600">Welcome Back!</p>
         </div>
 
         <Tabs defaultValue="signin" className="w-full">

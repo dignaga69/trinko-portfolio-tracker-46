@@ -2,19 +2,66 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 
 const Community = () => {
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, { min: number; max: number }>>({});
+  const [bestTradesTimeframe, setBestTradesTimeframe] = useState('ALL');
+  const [bestTradesSortConfig, setBestTradesSortConfig] = useState<{
+    key: string;
+    direction: 'asc' | 'desc';
+  }>({ key: 'alpha', direction: 'desc' });
+  
+  const [leaderboardSortConfig, setLeaderboardSortConfig] = useState<{
+    key: string;
+    direction: 'asc' | 'desc';
+  }>({ key: 'avgAlphaAll', direction: 'desc' });
 
-  const mockLeaderboardData = [
+  // Mock data for Best Trades
+  const mockBestTrades = [
     {
-      id: '1',
-      name: 'TradeGuru',
-      avatar: '',
+      ticker: 'AAPL',
+      entryDate: '2024-01-15',
+      side: 'LONG',
+      entryPrice: 185.64,
+      closeDate: '2024-02-20',
+      exitPrice: 195.12,
+      tickerReturn: 5.11,
+      sp500Return: 2.34,
+      alpha: 2.77,
+      user: 'TradeGuru'
+    },
+    {
+      ticker: 'TSLA',
+      entryDate: '2024-03-10',
+      side: 'SHORT',
+      entryPrice: 201.29,
+      closeDate: '2024-04-15',
+      exitPrice: 180.45,
+      tickerReturn: -10.35,
+      sp500Return: 1.85,
+      alpha: -12.20,
+      user: 'StockMaster'
+    },
+    {
+      ticker: 'NVDA',
+      entryDate: '2024-05-01',
+      side: 'LONG',
+      entryPrice: 875.28,
+      closeDate: '2024-06-10',
+      exitPrice: 920.15,
+      tickerReturn: 5.13,
+      sp500Return: 0.95,
+      alpha: 4.18,
+      user: 'InvestPro'
+    }
+  ];
+
+  // Mock data for Leaderboard
+  const mockLeaderboard = [
+    {
+      user: 'TradeGuru',
       trades: 42,
       successRateAll: 78.5,
       avgAlphaAll: 12.3,
@@ -22,9 +69,7 @@ const Community = () => {
       avgAlphaClosed: 15.7,
     },
     {
-      id: '2',
-      name: 'StockMaster',
-      avatar: '',
+      user: 'StockMaster',
       trades: 38,
       successRateAll: 72.3,
       avgAlphaAll: 9.8,
@@ -32,9 +77,7 @@ const Community = () => {
       avgAlphaClosed: 11.2,
     },
     {
-      id: '3',
-      name: 'InvestPro',
-      avatar: '',
+      user: 'InvestPro',
       trades: 55,
       successRateAll: 68.9,
       avgAlphaAll: 8.5,
@@ -43,184 +86,365 @@ const Community = () => {
     },
   ];
 
-  const filterOptions = [
-    { key: 'trades', label: 'Number of Trades', getValue: (user: any) => user.trades },
-    { key: 'successRateAll', label: 'Success Rate (All)', getValue: (user: any) => user.successRateAll },
-    { key: 'avgAlphaAll', label: 'Average Alpha (All)', getValue: (user: any) => user.avgAlphaAll },
-    { key: 'successRateClosed', label: 'Success Rate (Closed)', getValue: (user: any) => user.successRateClosed },
-    { key: 'avgAlphaClosed', label: 'Average Alpha (Closed)', getValue: (user: any) => user.avgAlphaClosed },
-  ];
-
-  const FilterDialog = ({ filterKey, label }: { filterKey: string; label: string }) => {
-    const [minValue, setMinValue] = useState(appliedFilters[filterKey]?.min?.toString() || '');
-    const [maxValue, setMaxValue] = useState(appliedFilters[filterKey]?.max?.toString() || '');
-    const [open, setOpen] = useState(false);
-
-    const handleApplyFilter = () => {
-      const min = parseFloat(minValue) || 0;
-      const max = parseFloat(maxValue) || Infinity;
-      
-      if (min > 0 || max < Infinity) {
-        setAppliedFilters(prev => ({
-          ...prev,
-          [filterKey]: { min, max }
-        }));
-      } else {
-        setAppliedFilters(prev => {
-          const newFilters = { ...prev };
-          delete newFilters[filterKey];
-          return newFilters;
-        });
-      }
-      setOpen(false);
-    };
-
-    const handleClearFilter = () => {
-      setMinValue('');
-      setMaxValue('');
-      setAppliedFilters(prev => {
-        const newFilters = { ...prev };
-        delete newFilters[filterKey];
-        return newFilters;
-      });
-      setOpen(false);
-    };
-
-    const isActive = appliedFilters[filterKey];
-
-    return (
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className={`${isActive ? 'bg-blue-50 border-blue-200 text-blue-700' : ''}`}
-          >
-            {label}
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Filter by {label}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="min">Minimum</Label>
-                <Input
-                  id="min"
-                  type="number"
-                  value={minValue}
-                  onChange={(e) => setMinValue(e.target.value)}
-                  placeholder="0"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="max">Maximum</Label>
-                <Input
-                  id="max"
-                  type="number"
-                  value={maxValue}
-                  onChange={(e) => setMaxValue(e.target.value)}
-                  placeholder="No limit"
-                />
-              </div>
-            </div>
-            <div className="flex gap-2 pt-4">
-              <Button onClick={handleApplyFilter} className="flex-1">
-                Apply Filter
-              </Button>
-              <Button variant="outline" onClick={handleClearFilter}>
-                Clear
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
+  const handleBestTradesSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'desc';
+    if (bestTradesSortConfig.key === key && bestTradesSortConfig.direction === 'desc') {
+      direction = 'asc';
+    }
+    setBestTradesSortConfig({ key, direction });
   };
 
-  const filteredLeaderboard = mockLeaderboardData.filter(user => {
-    return Object.entries(appliedFilters).every(([key, range]) => {
-      const filterOption = filterOptions.find(f => f.key === key);
-      if (!filterOption) return true;
-      
-      const value = filterOption.getValue(user);
-      return value >= range.min && value <= range.max;
-    });
+  const handleLeaderboardSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'desc';
+    if (leaderboardSortConfig.key === key && leaderboardSortConfig.direction === 'desc') {
+      direction = 'asc';
+    }
+    setLeaderboardSortConfig({ key, direction });
+  };
+
+  const sortedBestTrades = [...mockBestTrades].sort((a, b) => {
+    const { key, direction } = bestTradesSortConfig;
+    let aValue, bValue;
+    
+    switch (key) {
+      case 'ticker':
+        aValue = a.ticker;
+        bValue = b.ticker;
+        break;
+      case 'entryDate':
+        aValue = new Date(a.entryDate);
+        bValue = new Date(b.entryDate);
+        break;
+      case 'side':
+        aValue = a.side;
+        bValue = b.side;
+        break;
+      case 'entryPrice':
+        aValue = a.entryPrice;
+        bValue = b.entryPrice;
+        break;
+      case 'closeDate':
+        aValue = new Date(a.closeDate);
+        bValue = new Date(b.closeDate);
+        break;
+      case 'exitPrice':
+        aValue = a.exitPrice;
+        bValue = b.exitPrice;
+        break;
+      case 'tickerReturn':
+        aValue = a.tickerReturn;
+        bValue = b.tickerReturn;
+        break;
+      case 'sp500Return':
+        aValue = a.sp500Return;
+        bValue = b.sp500Return;
+        break;
+      case 'alpha':
+        aValue = a.alpha;
+        bValue = b.alpha;
+        break;
+      case 'user':
+        aValue = a.user;
+        bValue = b.user;
+        break;
+      default:
+        return 0;
+    }
+    
+    if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+    if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+    return 0;
   });
 
+  const sortedLeaderboard = [...mockLeaderboard].sort((a, b) => {
+    const { key, direction } = leaderboardSortConfig;
+    let aValue, bValue;
+    
+    switch (key) {
+      case 'user':
+        aValue = a.user;
+        bValue = b.user;
+        break;
+      case 'trades':
+        aValue = a.trades;
+        bValue = b.trades;
+        break;
+      case 'successRateAll':
+        aValue = a.successRateAll;
+        bValue = b.successRateAll;
+        break;
+      case 'avgAlphaAll':
+        aValue = a.avgAlphaAll;
+        bValue = b.avgAlphaAll;
+        break;
+      case 'successRateClosed':
+        aValue = a.successRateClosed;
+        bValue = b.successRateClosed;
+        break;
+      case 'avgAlphaClosed':
+        aValue = a.avgAlphaClosed;
+        bValue = b.avgAlphaClosed;
+        break;
+      default:
+        return 0;
+    }
+    
+    if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+    if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const SortButton = ({ 
+    label, 
+    sortKey, 
+    currentSortConfig, 
+    onSort 
+  }: { 
+    label: string; 
+    sortKey: string; 
+    currentSortConfig: { key: string; direction: 'asc' | 'desc' };
+    onSort: (key: string) => void;
+  }) => (
+    <button
+      onClick={() => onSort(sortKey)}
+      className="flex items-center gap-1 hover:text-gray-900 font-medium"
+    >
+      {label}
+      {currentSortConfig.key === sortKey && (
+        currentSortConfig.direction === 'desc' ? 
+          <ChevronDown size={14} /> : 
+          <ChevronUp size={14} />
+      )}
+    </button>
+  );
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{ fontFamily: 'Monaco, monospace' }}>
+      {/* Best Trades Section */}
+      <Card className="border-0 shadow-none bg-gray-50">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Best Trades</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Tabs value={bestTradesTimeframe} onValueChange={setBestTradesTimeframe}>
+              <TabsList className="grid w-full grid-cols-6">
+                <TabsTrigger value="1M">1M</TabsTrigger>
+                <TabsTrigger value="6M">6M</TabsTrigger>
+                <TabsTrigger value="1Y">1Y</TabsTrigger>
+                <TabsTrigger value="3Y">3Y</TabsTrigger>
+                <TabsTrigger value="5Y">5Y</TabsTrigger>
+                <TabsTrigger value="ALL">ALL</TabsTrigger>
+              </TabsList>
+            </Tabs>
+
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-center">
+                      <SortButton 
+                        label="TICKER" 
+                        sortKey="ticker" 
+                        currentSortConfig={bestTradesSortConfig}
+                        onSort={handleBestTradesSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <SortButton 
+                        label="ENTRY DATE" 
+                        sortKey="entryDate" 
+                        currentSortConfig={bestTradesSortConfig}
+                        onSort={handleBestTradesSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <SortButton 
+                        label="LONG/SHORT" 
+                        sortKey="side" 
+                        currentSortConfig={bestTradesSortConfig}
+                        onSort={handleBestTradesSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <SortButton 
+                        label="ENTRY PRICE" 
+                        sortKey="entryPrice" 
+                        currentSortConfig={bestTradesSortConfig}
+                        onSort={handleBestTradesSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <SortButton 
+                        label="CLOSE DATE" 
+                        sortKey="closeDate" 
+                        currentSortConfig={bestTradesSortConfig}
+                        onSort={handleBestTradesSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <SortButton 
+                        label="EXIT PRICE" 
+                        sortKey="exitPrice" 
+                        currentSortConfig={bestTradesSortConfig}
+                        onSort={handleBestTradesSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <SortButton 
+                        label="TICKER RETURN" 
+                        sortKey="tickerReturn" 
+                        currentSortConfig={bestTradesSortConfig}
+                        onSort={handleBestTradesSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <SortButton 
+                        label="S&P500 RETURN" 
+                        sortKey="sp500Return" 
+                        currentSortConfig={bestTradesSortConfig}
+                        onSort={handleBestTradesSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <SortButton 
+                        label="ALPHA" 
+                        sortKey="alpha" 
+                        currentSortConfig={bestTradesSortConfig}
+                        onSort={handleBestTradesSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <SortButton 
+                        label="USER" 
+                        sortKey="user" 
+                        currentSortConfig={bestTradesSortConfig}
+                        onSort={handleBestTradesSort}
+                      />
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sortedBestTrades.map((trade, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="text-center font-semibold">{trade.ticker}</TableCell>
+                      <TableCell className="text-center">{trade.entryDate}</TableCell>
+                      <TableCell className="text-center">
+                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                          trade.side === 'LONG' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {trade.side}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center">${trade.entryPrice.toFixed(2)}</TableCell>
+                      <TableCell className="text-center">{trade.closeDate}</TableCell>
+                      <TableCell className="text-center">${trade.exitPrice.toFixed(2)}</TableCell>
+                      <TableCell className={`text-center font-semibold ${
+                        trade.tickerReturn >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {trade.tickerReturn >= 0 ? '+' : ''}{trade.tickerReturn.toFixed(2)}%
+                      </TableCell>
+                      <TableCell className={`text-center font-semibold ${
+                        trade.sp500Return >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {trade.sp500Return >= 0 ? '+' : ''}{trade.sp500Return.toFixed(2)}%
+                      </TableCell>
+                      <TableCell className={`text-center font-semibold ${
+                        trade.alpha >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {trade.alpha >= 0 ? '+' : ''}{trade.alpha.toFixed(2)}%
+                      </TableCell>
+                      <TableCell className="text-center">{trade.user}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Leaderboard Section */}
       <Card className="border-0 shadow-none bg-gray-50">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Leaderboard</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-2">
-              {filterOptions.map((filter) => (
-                <FilterDialog
-                  key={filter.key}
-                  filterKey={filter.key}
-                  label={filter.label}
-                />
-              ))}
-            </div>
-
-            <div className="space-y-3">
-              {filteredLeaderboard.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-8">
-                  No traders match your current filters.
-                </p>
-              ) : (
-                filteredLeaderboard.map((user, index) => (
-                  <div
-                    key={user.id}
-                    className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full text-sm font-semibold text-gray-600">
-                        #{index + 1}
-                      </div>
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage src={user.avatar} />
-                        <AvatarFallback className="text-sm font-semibold">
-                          {user.name.substring(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium text-gray-900">{user.name}</div>
-                        <div className="text-sm text-gray-500">{user.trades} trades</div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-6 text-sm">
-                      <div className="text-center">
-                        <div className="font-semibold text-gray-900">{user.successRateAll.toFixed(1)}%</div>
-                        <div className="text-xs text-gray-500">Success (All)</div>
-                      </div>
-                      <div className="text-center">
-                        <div className={`font-semibold ${user.avgAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {user.avgAlphaAll >= 0 ? '+' : ''}{user.avgAlphaAll.toFixed(1)}%
-                        </div>
-                        <div className="text-xs text-gray-500">Alpha (All)</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="font-semibold text-gray-900">{user.successRateClosed.toFixed(1)}%</div>
-                        <div className="text-xs text-gray-500">Success (Closed)</div>
-                      </div>
-                      <div className="text-center">
-                        <div className={`font-semibold ${user.avgAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {user.avgAlphaClosed >= 0 ? '+' : ''}{user.avgAlphaClosed.toFixed(1)}%
-                        </div>
-                        <div className="text-xs text-gray-500">Alpha (Closed)</div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-center">
+                    <SortButton 
+                      label="USER" 
+                      sortKey="user" 
+                      currentSortConfig={leaderboardSortConfig}
+                      onSort={handleLeaderboardSort}
+                    />
+                  </TableHead>
+                  <TableHead className="text-center">
+                    <SortButton 
+                      label="NUMBER OF TRADES" 
+                      sortKey="trades" 
+                      currentSortConfig={leaderboardSortConfig}
+                      onSort={handleLeaderboardSort}
+                    />
+                  </TableHead>
+                  <TableHead className="text-center">
+                    <SortButton 
+                      label="SUCCESS RATE (ALL)" 
+                      sortKey="successRateAll" 
+                      currentSortConfig={leaderboardSortConfig}
+                      onSort={handleLeaderboardSort}
+                    />
+                  </TableHead>
+                  <TableHead className="text-center">
+                    <SortButton 
+                      label="AVERAGE ALPHA (ALL)" 
+                      sortKey="avgAlphaAll" 
+                      currentSortConfig={leaderboardSortConfig}
+                      onSort={handleLeaderboardSort}
+                    />
+                  </TableHead>
+                  <TableHead className="text-center">
+                    <SortButton 
+                      label="SUCCESS RATE (CLOSED)" 
+                      sortKey="successRateClosed" 
+                      currentSortConfig={leaderboardSortConfig}
+                      onSort={handleLeaderboardSort}
+                    />
+                  </TableHead>
+                  <TableHead className="text-center">
+                    <SortButton 
+                      label="AVERAGE ALPHA (CLOSED)" 
+                      sortKey="avgAlphaClosed" 
+                      currentSortConfig={leaderboardSortConfig}
+                      onSort={handleLeaderboardSort}
+                    />
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedLeaderboard.map((trader, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="text-center font-semibold">{trader.user}</TableCell>
+                    <TableCell className="text-center">{trader.trades}</TableCell>
+                    <TableCell className="text-center">{trader.successRateAll.toFixed(1)}%</TableCell>
+                    <TableCell className={`text-center font-semibold ${
+                      trader.avgAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {trader.avgAlphaAll >= 0 ? '+' : ''}{trader.avgAlphaAll.toFixed(1)}%
+                    </TableCell>
+                    <TableCell className="text-center">{trader.successRateClosed.toFixed(1)}%</TableCell>
+                    <TableCell className={`text-center font-semibold ${
+                      trader.avgAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {trader.avgAlphaClosed >= 0 ? '+' : ''}{trader.avgAlphaClosed.toFixed(1)}%
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>

@@ -81,7 +81,7 @@ const Index = () => {
   // Show loading state while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center" style={{ fontFamily: 'Monaco, monospace' }}>
         <div className="text-gray-500">Loading...</div>
       </div>
     );
@@ -93,7 +93,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Monaco, monospace' }}>
       {/* Center the entire app with max width and horizontal margins */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-8 py-8">
         <div className="flex">
