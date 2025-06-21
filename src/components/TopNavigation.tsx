@@ -31,7 +31,7 @@ const TopNavigation = () => {
   return (
     <div className="w-full bg-white border-b border-gray-100 px-8 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <h1 className="text-2xl font-black text-gray-900 tracking-tight">         TRINKO</h1>
+        <h1 className="text-2xl font-black text-gray-900 tracking-tight ml-6">TRINKO</h1>
         
         <div className="flex items-center space-x-4">
           {user ? (
