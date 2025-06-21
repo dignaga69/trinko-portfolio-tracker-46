@@ -1,23 +1,21 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Home as HomeIcon } from 'lucide-react';
 
 const Home = () => {
   const { user } = useAuth();
 
   // Mock data for now
   const trendingPros = [
-    { name: "TraderPro1", winRate: "87%", averageAlpha: "+234%" },
-    { name: "WallStreetKing", winRate: "82%", averageAlpha: "+187%" },
-    { name: "StockMaster", winRate: "79%", averageAlpha: "+156%" },
+    { name: "TraderPro1", profit: "$12,453", accuracy: "87%" },
+    { name: "WallStreetKing", profit: "$11,234", accuracy: "82%" },
+    { name: "StockMaster", profit: "$9,876", accuracy: "79%" },
   ];
 
   const legendaryCalls = [
-    { ticker: "AAPL", entryDate: "2024-01-15", exitDate: "2024-03-20", alpha: "+234%" },
-    { ticker: "TSLA", entryDate: "2024-02-03", exitDate: "2024-04-10", alpha: "+187%" },
-    { ticker: "NVDA", entryDate: "2024-01-28", exitDate: "2024-03-15", alpha: "+156%" },
+    { ticker: "AAPL", profit: "+234%", user: "TraderPro1", date: "2024-01-15" },
+    { ticker: "TSLA", profit: "+187%", user: "WallStreetKing", date: "2024-02-03" },
+    { ticker: "NVDA", profit: "+156%", user: "StockMaster", date: "2024-01-28" },
   ];
 
   const topDiscussions = [
@@ -28,57 +26,20 @@ const Home = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <HomeIcon size={24} />
-        <h1 className="text-2xl font-bold">Home</h1>
-      </div>
-
-      {/* Your Performance - moved to top */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Your Performance</CardTitle>
-        </CardHeader>
-        <Separator />
-        <CardContent className="pt-6">
-          {user ? (
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <p className="text-2xl font-bold">0</p>
-                <p className="text-sm text-gray-600">Total Trades</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold">0%</p>
-                <p className="text-sm text-gray-600">Win Rate (All)</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold">0%</p>
-                <p className="text-sm text-gray-600">Average Alpha (All)</p>
-              </div>
-            </div>
-          ) : (
-            <p className="text-center text-gray-500">Sign in to view your performance</p>
-          )}
-        </CardContent>
-      </Card>
-
       <div className="grid grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-semibold">Trending Pros</CardTitle>
           </CardHeader>
-          <Separator />
-          <CardContent className="pt-6">
+          <CardContent>
             <div className="space-y-3">
-              <div className="grid grid-cols-3 gap-4 text-sm font-medium text-gray-500 border-b pb-2">
-                <div>User</div>
-                <div>Win Rate (All)</div>
-                <div>Average Alpha (All)</div>
-              </div>
               {trendingPros.map((pro, index) => (
-                <div key={index} className="grid grid-cols-3 gap-4 items-center">
-                  <p className="text-sm font-medium">{pro.name}</p>
-                  <p className="text-sm">{pro.winRate}</p>
-                  <p className="text-sm font-semibold text-green-600">{pro.averageAlpha}</p>
+                <div key={index} className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">{pro.name}</p>
+                    <p className="text-sm text-gray-600">Accuracy: {pro.accuracy}</p>
+                  </div>
+                  <p className="font-semibold text-green-600">{pro.profit}</p>
                 </div>
               ))}
             </div>
@@ -89,21 +50,15 @@ const Home = () => {
           <CardHeader>
             <CardTitle className="text-lg font-semibold">Legendary Calls</CardTitle>
           </CardHeader>
-          <Separator />
-          <CardContent className="pt-6">
+          <CardContent>
             <div className="space-y-3">
-              <div className="grid grid-cols-4 gap-3 text-sm font-medium text-gray-500 border-b pb-2">
-                <div>Ticker</div>
-                <div>Entry Date</div>
-                <div>Exit Date</div>
-                <div>Alpha</div>
-              </div>
               {legendaryCalls.map((call, index) => (
-                <div key={index} className="grid grid-cols-4 gap-3 items-center">
-                  <p className="text-sm font-medium">{call.ticker}</p>
-                  <p className="text-sm">{call.entryDate}</p>
-                  <p className="text-sm">{call.exitDate}</p>
-                  <p className="text-sm font-semibold text-green-600">{call.alpha}</p>
+                <div key={index} className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">{call.ticker}</p>
+                    <p className="text-sm text-gray-600">by {call.user}</p>
+                  </div>
+                  <p className="font-semibold text-green-600">{call.profit}</p>
                 </div>
               ))}
             </div>
@@ -115,8 +70,7 @@ const Home = () => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Join The Discussions</CardTitle>
         </CardHeader>
-        <Separator />
-        <CardContent className="pt-6">
+        <CardContent>
           <div className="space-y-3">
             {topDiscussions.map((discussion, index) => (
               <div key={index} className="flex justify-between items-center">
@@ -128,6 +82,32 @@ const Home = () => {
               </div>
             ))}
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Your Performance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {user ? (
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-2xl font-bold text-green-600">$0</p>
+                <p className="text-sm text-gray-600">Total P&L</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold">0</p>
+                <p className="text-sm text-gray-600">Total Trades</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold">0%</p>
+                <p className="text-sm text-gray-600">Win Rate</p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-center text-gray-500">Sign in to view your performance</p>
+          )}
         </CardContent>
       </Card>
     </div>
