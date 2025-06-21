@@ -1,10 +1,8 @@
 
-import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
   activeSection: string;
@@ -12,9 +10,8 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
-  const [showPassword, setShowPassword] = useState(false);
+  const { user, signOut, loading } = useAuth();
+  const navigate = useNavigate();
 
   const menuItems = [
     { id: 'log-trade', label: 'Log Trade' },
@@ -22,16 +19,21 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
     { id: 'community', label: 'Community' }
   ];
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Login attempted:', loginForm);
-    setIsLoggedIn(true);
-    setLoginForm({ email: '', password: '' });
+  const handleSignOut = async () => {
+    await signOut();
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
+  const handleSignIn = () => {
+    navigate('/auth');
   };
+
+  if (loading) {
+    return (
+      <div className="w-64 h-screen bg-white border-r border-gray-100 p-8 flex items-center justify-center">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-64 h-screen bg-white border-r border-gray-100 p-8 flex flex-col">
@@ -54,86 +56,32 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
             {item.label}
           </button>
         ))}
-      </nav>
 
-      <div className="mt-auto pt-6 border-t border-gray-100">
-        {isLoggedIn ? (
-          <div className="space-y-3">
-            <div className="text-sm text-gray-600 text-center">
-              Welcome back, TradeGuru!
+        {/* Auth button placed right below Community */}
+        <div className="pt-4">
+          {user ? (
+            <div className="space-y-3">
+              <div className="text-sm text-gray-600 text-center">
+                Welcome back, {user.user_metadata?.full_name || 'Trader'}!
+              </div>
+              <Button 
+                variant="outline" 
+                className="w-full text-sm"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </Button>
             </div>
+          ) : (
             <Button 
-              variant="outline" 
-              className="w-full text-sm"
-              onClick={handleLogout}
+              className="w-full text-sm bg-orange-500 hover:bg-orange-600 text-white"
+              onClick={handleSignIn}
             >
-              Sign Out
+              Sign In
             </Button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="w-full text-sm bg-orange-500 hover:bg-orange-600 text-white">
-                  Sign In
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md p-8 bg-white rounded-3xl border-0 shadow-2xl">
-                <div className="space-y-6">
-                  <div className="text-center space-y-2">
-                    <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
-                    <p className="text-gray-500 text-sm">
-                      Enter your credentials to access your account
-                    </p>
-                  </div>
-                  
-                  <form onSubmit={handleLogin} className="space-y-4">
-                    <div>
-                      <Input
-                        type="email"
-                        placeholder="Email address"
-                        value={loginForm.email}
-                        onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
-                        className="h-12 bg-gray-50 border-gray-200 rounded-lg px-4 text-gray-900 placeholder:text-gray-400"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Password"
-                        value={loginForm.password}
-                        onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
-                        className="h-12 bg-gray-50 border-gray-200 rounded-lg px-4 pr-12 text-gray-900 placeholder:text-gray-400"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
-                    </div>
-                    
-                    <Button 
-                      type="submit" 
-                      className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg text-base"
-                    >
-                      Sign In
-                    </Button>
-                  </form>
-                  
-                  <div className="text-center text-sm text-gray-500">
-                    Don't have an account? Contact us to get started.
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </nav>
     </div>
   );
 };
