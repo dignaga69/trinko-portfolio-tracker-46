@@ -29,7 +29,7 @@ const Home = () => {
       <div className="grid grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">TRENDING PROS</CardTitle>
+            <CardTitle className="text-lg font-semibold">Trending Pros</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -48,7 +48,7 @@ const Home = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">LEGENDARY CALLS</CardTitle>
+            <CardTitle className="text-lg font-semibold">Legendary Calls</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -68,7 +68,7 @@ const Home = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">JOIN THE DISCUSSIONS</CardTitle>
+          <CardTitle className="text-lg font-semibold">Join The Discussions</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -87,7 +87,7 @@ const Home = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">YOUR PERFORMANCE</CardTitle>
+          <CardTitle className="text-lg font-semibold">Your Performance</CardTitle>
         </CardHeader>
         <CardContent>
           {user ? (
