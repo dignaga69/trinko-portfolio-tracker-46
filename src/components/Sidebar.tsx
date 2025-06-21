@@ -31,16 +31,16 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
 
   if (loading) {
     return (
-      <div className="w-64 h-screen bg-white border-r border-gray-100 p-8 flex items-center justify-center" style={{ fontFamily: 'Monaco, monospace' }}>
+      <div className="w-64 h-screen bg-white border-r border-gray-100 p-8 flex items-center justify-center">
         <div className="text-gray-500">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="w-64 h-screen bg-white border-r border-gray-100 p-8 flex flex-col" style={{ fontFamily: 'Monaco, monospace' }}>
+    <div className="w-64 h-screen bg-white border-r border-gray-100 p-8 flex flex-col">
       <div className="mb-12">
-        <h1 className="text-2xl font-black text-gray-900 tracking-tight">TRINKO</h1>
+        <h1 className="text-2xl font-black text-gray-900 tracking-tight" style={{ fontFamily: 'Monaco, monospace' }}>TRINKO</h1>
       </div>
       
       <nav className="space-y-2 flex-1">

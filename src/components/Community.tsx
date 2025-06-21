@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -219,8 +218,93 @@ const Community = () => {
   );
 
   return (
-    <div className="space-y-6" style={{ fontFamily: 'Monaco, monospace' }}>
-      {/* Best Trades Section */}
+    <div className="space-y-6">
+      {/* Leaderboard Section - Now comes first */}
+      <Card className="border-0 shadow-none bg-gray-50">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Leaderboard</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-center">
+                    <SortButton 
+                      label="USER" 
+                      sortKey="user" 
+                      currentSortConfig={leaderboardSortConfig}
+                      onSort={handleLeaderboardSort}
+                    />
+                  </TableHead>
+                  <TableHead className="text-center">
+                    <SortButton 
+                      label="NUMBER OF TRADES" 
+                      sortKey="trades" 
+                      currentSortConfig={leaderboardSortConfig}
+                      onSort={handleLeaderboardSort}
+                    />
+                  </TableHead>
+                  <TableHead className="text-center">
+                    <SortButton 
+                      label="SUCCESS RATE (ALL)" 
+                      sortKey="successRateAll" 
+                      currentSortConfig={leaderboardSortConfig}
+                      onSort={handleLeaderboardSort}
+                    />
+                  </TableHead>
+                  <TableHead className="text-center">
+                    <SortButton 
+                      label="AVERAGE ALPHA (ALL)" 
+                      sortKey="avgAlphaAll" 
+                      currentSortConfig={leaderboardSortConfig}
+                      onSort={handleLeaderboardSort}
+                    />
+                  </TableHead>
+                  <TableHead className="text-center">
+                    <SortButton 
+                      label="SUCCESS RATE (CLOSED)" 
+                      sortKey="successRateClosed" 
+                      currentSortConfig={leaderboardSortConfig}
+                      onSort={handleLeaderboardSort}
+                    />
+                  </TableHead>
+                  <TableHead className="text-center">
+                    <SortButton 
+                      label="AVERAGE ALPHA (CLOSED)" 
+                      sortKey="avgAlphaClosed" 
+                      currentSortConfig={leaderboardSortConfig}
+                      onSort={handleLeaderboardSort}
+                    />
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedLeaderboard.map((trader, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="text-center font-semibold">{trader.user}</TableCell>
+                    <TableCell className="text-center">{trader.trades}</TableCell>
+                    <TableCell className="text-center">{trader.successRateAll.toFixed(1)}%</TableCell>
+                    <TableCell className={`text-center font-semibold ${
+                      trader.avgAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {trader.avgAlphaAll >= 0 ? '+' : ''}{trader.avgAlphaAll.toFixed(1)}%
+                    </TableCell>
+                    <TableCell className="text-center">{trader.successRateClosed.toFixed(1)}%</TableCell>
+                    <TableCell className={`text-center font-semibold ${
+                      trader.avgAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {trader.avgAlphaClosed >= 0 ? '+' : ''}{trader.avgAlphaClosed.toFixed(1)}%
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Best Trades Section - Now comes second */}
       <Card className="border-0 shadow-none bg-gray-50">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Best Trades</CardTitle>
@@ -360,91 +444,6 @@ const Community = () => {
                 </TableBody>
               </Table>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Leaderboard Section */}
-      <Card className="border-0 shadow-none bg-gray-50">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Leaderboard</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-center">
-                    <SortButton 
-                      label="USER" 
-                      sortKey="user" 
-                      currentSortConfig={leaderboardSortConfig}
-                      onSort={handleLeaderboardSort}
-                    />
-                  </TableHead>
-                  <TableHead className="text-center">
-                    <SortButton 
-                      label="NUMBER OF TRADES" 
-                      sortKey="trades" 
-                      currentSortConfig={leaderboardSortConfig}
-                      onSort={handleLeaderboardSort}
-                    />
-                  </TableHead>
-                  <TableHead className="text-center">
-                    <SortButton 
-                      label="SUCCESS RATE (ALL)" 
-                      sortKey="successRateAll" 
-                      currentSortConfig={leaderboardSortConfig}
-                      onSort={handleLeaderboardSort}
-                    />
-                  </TableHead>
-                  <TableHead className="text-center">
-                    <SortButton 
-                      label="AVERAGE ALPHA (ALL)" 
-                      sortKey="avgAlphaAll" 
-                      currentSortConfig={leaderboardSortConfig}
-                      onSort={handleLeaderboardSort}
-                    />
-                  </TableHead>
-                  <TableHead className="text-center">
-                    <SortButton 
-                      label="SUCCESS RATE (CLOSED)" 
-                      sortKey="successRateClosed" 
-                      currentSortConfig={leaderboardSortConfig}
-                      onSort={handleLeaderboardSort}
-                    />
-                  </TableHead>
-                  <TableHead className="text-center">
-                    <SortButton 
-                      label="AVERAGE ALPHA (CLOSED)" 
-                      sortKey="avgAlphaClosed" 
-                      currentSortConfig={leaderboardSortConfig}
-                      onSort={handleLeaderboardSort}
-                    />
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sortedLeaderboard.map((trader, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="text-center font-semibold">{trader.user}</TableCell>
-                    <TableCell className="text-center">{trader.trades}</TableCell>
-                    <TableCell className="text-center">{trader.successRateAll.toFixed(1)}%</TableCell>
-                    <TableCell className={`text-center font-semibold ${
-                      trader.avgAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {trader.avgAlphaAll >= 0 ? '+' : ''}{trader.avgAlphaAll.toFixed(1)}%
-                    </TableCell>
-                    <TableCell className="text-center">{trader.successRateClosed.toFixed(1)}%</TableCell>
-                    <TableCell className={`text-center font-semibold ${
-                      trader.avgAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {trader.avgAlphaClosed >= 0 ? '+' : ''}{trader.avgAlphaClosed.toFixed(1)}%
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
           </div>
         </CardContent>
       </Card>
