@@ -44,7 +44,7 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
               )}
             >
               <IconComponent size={18} />
-              {item.label}
+              <span className="text-left">{item.label}</span>
             </button>
           );
         })}
