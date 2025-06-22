@@ -67,7 +67,6 @@ const PortfolioManager = ({
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-lg font-semibold">Portfolio Management</h2>
           <p className="text-sm italic text-gray-600 mt-2">
             Create and manage your trading portfolios. Portfolio names cannot exceed 25 characters.
           </p>
