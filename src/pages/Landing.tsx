@@ -34,7 +34,7 @@ const Landing = () => {
           </h2>
           
           <p className="text-lg text-gray-600 leading-relaxed">
-            Track Your Trades, Get Performance Insights, Compare Them To Others, And Much More At Trinko.Ai.
+            Track Your Trades, Get Performance Insights, Compare Them To Others, And Much More At Trinko.Ai
           </p>
           
           <div className="pt-4">
