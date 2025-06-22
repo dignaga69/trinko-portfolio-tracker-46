@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePrivacy } from '@/contexts/PrivacyContext';
 import TopNavigation from '@/components/TopNavigation';
@@ -33,12 +32,29 @@ interface Portfolio {
 }
 
 const Index = () => {
-  const { loading } = useAuth();
+  const { user, loading } = useAuth();
   const { isPrivate } = usePrivacy();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState('portfolio');
   const [trades, setTrades] = useState<Trade[]>([]);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<string>('');
+
+  // Check if user is logged in, if not redirect to landing
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/');
+    }
+  }, [user, loading, navigate]);
+
+  // Handle URL section parameter
+  useEffect(() => {
+    const section = searchParams.get('section');
+    if (section && ['portfolio', 'log-trade', 'performance', 'leaderboard'].includes(section)) {
+      setActiveSection(section);
+    }
+  }, [searchParams]);
 
   // Portfolio management functions
   const handleCreatePortfolio = (name: string) => {
@@ -176,6 +192,11 @@ const Index = () => {
         <div className="text-gray-500">Loading...</div>
       </div>
     );
+  }
+
+  // If not logged in, this will redirect via useEffect above
+  if (!user) {
+    return null;
   }
 
   return (
