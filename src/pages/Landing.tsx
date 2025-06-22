@@ -1,4 +1,4 @@
-
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,14 @@ import Footer from '@/components/Footer';
 
 const Landing = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  // Redirect logged-in users to the main app
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/app');
+    }
+  }, [user, loading, navigate]);
 
   const handleLaunchPortfolio = () => {
     if (user) {
@@ -18,6 +25,20 @@ const Landing = () => {
       navigate('/auth');
     }
   };
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
+  // If logged in, this will redirect via useEffect above
+  if (user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
