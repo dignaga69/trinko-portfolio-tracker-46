@@ -9,6 +9,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ChevronUp, ChevronDown, EyeOff, Search, ChevronDown as ChevronDownIcon } from 'lucide-react';
 import FilterDialog from './FilterDialog';
+import SortButton from './SortButton';
 
 interface CommunityProps {
   isUserPrivate?: boolean;
@@ -345,15 +346,18 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
           }}
           currentCondition={filterKey.startsWith('leaderboard-') ? 
             leaderboardFilters[filterKey.replace('leaderboard-', '') as keyof typeof leaderboardFilters]?.condition :
-            bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters]?.condition
+            (filterKey.replace('bestTrades-', '') === 'side' ? '' : 
+             (bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters] as any)?.condition)
           }
           currentValue={filterKey.startsWith('leaderboard-') ? 
             leaderboardFilters[filterKey.replace('leaderboard-', '') as keyof typeof leaderboardFilters]?.value :
-            bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters]?.value
+            (filterKey.replace('bestTrades-', '') === 'side' ? '' : 
+             (bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters] as any)?.value)
           }
           currentValue2={filterKey.startsWith('leaderboard-') ? 
             leaderboardFilters[filterKey.replace('leaderboard-', '') as keyof typeof leaderboardFilters]?.value2 :
-            bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters]?.value2
+            (filterKey.replace('bestTrades-', '') === 'side' ? '' : 
+             (bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters] as any)?.value2)
           }
           isDateFilter={isDateFilter}
         />
