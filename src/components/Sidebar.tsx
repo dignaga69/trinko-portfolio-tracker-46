@@ -1,7 +1,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { Home, FileText, BarChart3, Trophy, MessageSquare } from 'lucide-react';
+import { FileText, BarChart3, Trophy } from 'lucide-react';
 
 interface SidebarProps {
   activeSection: string;
@@ -12,11 +12,9 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
   const { user, loading } = useAuth();
 
   const menuItems = [
-    { id: 'home', label: 'Home', icon: Home },
     { id: 'log-trade', label: 'Log Trade', icon: FileText },
     { id: 'performance', label: 'Performance', icon: BarChart3 },
-    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
-    { id: 'forum', label: 'Forum', icon: MessageSquare }
+    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy }
   ];
 
   if (loading) {

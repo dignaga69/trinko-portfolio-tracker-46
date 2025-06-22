@@ -31,50 +31,56 @@ const TopNavigation = () => {
   return (
     <div className="w-full bg-white border-b border-gray-100 px-8 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <h1 className="text-2xl font-black text-gray-900 tracking-tight ml-50">TRINKO</h1>
+        {/* Left side - TRINKO aligned with sidebar */}
+        <div className="w-64 flex items-center">
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight">TRINKO</h1>
+        </div>
         
-        <div className="flex items-center space-x-4">
-          {user ? (
-            <>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
-                    <Bell size={20} />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80">
-                  <div className="text-sm text-gray-500 text-center py-4">
-                    No notifications yet
-                  </div>
-                </PopoverContent>
-              </Popover>
+        {/* Right side - User controls aligned with main content */}
+        <div className="flex-1 flex justify-end max-w-4xl">
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="icon" className="relative">
+                      <Bell size={20} />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80">
+                    <div className="text-sm text-gray-500 text-center py-4">
+                      No notifications yet
+                    </div>
+                  </PopoverContent>
+                </Popover>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <User size={20} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Manage Account
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
-          ) : (
-            <Button 
-              className="bg-orange-500 hover:bg-orange-600 text-white"
-              onClick={handleSignIn}
-            >
-              Sign In
-            </Button>
-          )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <User size={20} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>
+                      <Settings className="mr-2 h-4 w-4" />
+                      Manage Account
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleSignOut}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <Button 
+                className="bg-orange-500 hover:bg-orange-600 text-white"
+                onClick={handleSignIn}
+              >
+                Sign In
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

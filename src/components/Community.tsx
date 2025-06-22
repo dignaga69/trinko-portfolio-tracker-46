@@ -1,11 +1,16 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronUp, ChevronDown, EyeOff } from 'lucide-react';
 
-const Community = () => {
+interface CommunityProps {
+  isUserPrivate?: boolean;
+}
+
+const Community = ({ isUserPrivate = false }: CommunityProps) => {
   const [bestTradesTimeframe, setBestTradesTimeframe] = useState('ALL');
   const [bestTradesSortConfig, setBestTradesSortConfig] = useState<{
     key: string;
@@ -217,10 +222,25 @@ const Community = () => {
     </button>
   );
 
+  const PrivacyOverlay = () => (
+    <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10">
+      <div className="text-center space-y-3">
+        <EyeOff size={48} className="mx-auto text-gray-400" />
+        <div>
+          <h3 className="font-semibold text-gray-900">Content Hidden</h3>
+          <p className="text-sm text-gray-600 max-w-xs">
+            You've set your performance to private, so you cannot view other users' performances.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       {/* Leaderboard Section - Now comes first */}
-      <Card className="border-0 shadow-none bg-gray-50">
+      <Card className="border-0 shadow-none bg-gray-50 relative">
+        {isUserPrivate && <PrivacyOverlay />}
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Leaderboard</CardTitle>
           <p className="text-sm italic text-gray-600 mt-2">
@@ -308,7 +328,8 @@ const Community = () => {
       </Card>
 
       {/* Best Trades Section - Now comes second */}
-      <Card className="border-0 shadow-none bg-gray-50">
+      <Card className="border-0 shadow-none bg-gray-50 relative">
+        {isUserPrivate && <PrivacyOverlay />}
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Best Trades</CardTitle>
           <p className="text-sm italic text-gray-600 mt-2">

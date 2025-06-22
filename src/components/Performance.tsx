@@ -4,6 +4,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Edit2, Twitter, Linkedin } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { usePrivacy } from '@/contexts/PrivacyContext';
+import PrivacyToggle from './PrivacyToggle';
 
 interface Trade {
   id: string;
@@ -23,6 +25,8 @@ interface PerformanceProps {
 }
 
 const Performance = ({ trades }: PerformanceProps) => {
+  const { isPrivate, setIsPrivate } = usePrivacy();
+
   const calculateReturns = (trade: Trade) => {
     if (trade.status === 'open') {
       // For open trades, calculate returns based on current mock price
@@ -74,6 +78,9 @@ const Performance = ({ trades }: PerformanceProps) => {
 
   return (
     <div className="space-y-6">
+      {/* Privacy Toggle */}
+      <PrivacyToggle isPrivate={isPrivate} onToggle={setIsPrivate} />
+
       {/* Profile Section */}
       <Card className="border-0 shadow-none bg-gray-50">
         <CardContent className="pt-6">

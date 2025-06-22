@@ -1,15 +1,14 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePrivacy } from '@/contexts/PrivacyContext';
 import TopNavigation from '@/components/TopNavigation';
 import Sidebar from '@/components/Sidebar';
-import Home from '@/components/Home';
 import LogTradeWrapper from '@/components/LogTradeWrapper';
 import PerformanceWrapper from '@/components/PerformanceWrapper';
 import Community from '@/components/Community';
-import Forum from '@/components/Forum';
 import Footer from '@/components/Footer';
+import { FileText, BarChart3, Trophy } from 'lucide-react';
 
 interface Trade {
   id: string;
@@ -26,7 +25,8 @@ interface Trade {
 
 const Index = () => {
   const { loading } = useAuth();
-  const [activeSection, setActiveSection] = useState('home');
+  const { isPrivate } = usePrivacy();
+  const [activeSection, setActiveSection] = useState('log-trade');
   const [trades, setTrades] = useState<Trade[]>([]);
 
   const handleAddTrade = (newTrade: Omit<Trade, 'id'>) => {
@@ -54,10 +54,34 @@ const Index = () => {
     }));
   };
 
+  const getSectionIcon = () => {
+    switch (activeSection) {
+      case 'log-trade':
+        return <FileText size={24} className="mr-2" />;
+      case 'performance':
+        return <BarChart3 size={24} className="mr-2" />;
+      case 'leaderboard':
+        return <Trophy size={24} className="mr-2" />;
+      default:
+        return null;
+    }
+  };
+
+  const getSectionTitle = () => {
+    switch (activeSection) {
+      case 'log-trade':
+        return 'Log Trade';
+      case 'performance':
+        return 'Performance';
+      case 'leaderboard':
+        return 'Leaderboard';
+      default:
+        return '';
+    }
+  };
+
   const renderContent = () => {
     switch (activeSection) {
-      case 'home':
-        return <Home />;
       case 'log-trade':
         return (
           <LogTradeWrapper 
@@ -69,11 +93,15 @@ const Index = () => {
       case 'performance':
         return <PerformanceWrapper trades={trades} />;
       case 'leaderboard':
-        return <Community />;
-      case 'forum':
-        return <Forum />;
+        return <Community isUserPrivate={isPrivate} />;
       default:
-        return <Home />;
+        return (
+          <LogTradeWrapper 
+            trades={trades}
+            onAddTrade={handleAddTrade}
+            onCloseTrade={handleCloseTrade}
+          />
+        );
     }
   };
 
@@ -100,6 +128,12 @@ const Index = () => {
           
           <main className="flex-1 ml-8">
             <div className="max-w-4xl mt-16">
+              {/* Section Header */}
+              <div className="flex items-center mb-6">
+                {getSectionIcon()}
+                <h1 className="text-2xl font-bold">{getSectionTitle()}</h1>
+              </div>
+              
               {renderContent()}
             </div>
           </main>
