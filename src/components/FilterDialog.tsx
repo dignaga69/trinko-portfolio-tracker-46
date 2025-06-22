@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface FilterDialogProps {
   isOpen: boolean;
@@ -64,44 +63,78 @@ const FilterDialog = ({
     onClose();
   };
 
-  return (
-    <Popover open={isOpen} onOpenChange={onClose}>
-      <PopoverTrigger asChild>
-        <div />
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-4 bg-white border border-gray-200 shadow-lg">
-        <div className="space-y-3">
-          <div>
-            <label className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2 block">
-              {title}
-            </label>
-            <Select value={condition} onValueChange={setCondition}>
-              <SelectTrigger className="text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200">
-                <SelectItem value="above" className="text-xs">Above</SelectItem>
-                <SelectItem value="above-equal" className="text-xs">Above or equal</SelectItem>
-                <SelectItem value="below" className="text-xs">Below</SelectItem>
-                <SelectItem value="below-equal" className="text-xs">Below or equal</SelectItem>
-                <SelectItem value="equal" className="text-xs">Equal</SelectItem>
-                <SelectItem value="between" className="text-xs">Between</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+  if (!isOpen) return null;
 
-          {isDateFilter ? (
-            <>
+  return (
+    <div className="w-80 p-4 bg-white border border-gray-200 shadow-lg rounded-md">
+      <div className="space-y-3">
+        <div>
+          <label className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2 block">
+            {title}
+          </label>
+          <Select value={condition} onValueChange={setCondition}>
+            <SelectTrigger className="text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-white border border-gray-200 z-50">
+              <SelectItem value="above" className="text-xs">Above</SelectItem>
+              <SelectItem value="above-equal" className="text-xs">Above or equal</SelectItem>
+              <SelectItem value="below" className="text-xs">Below</SelectItem>
+              <SelectItem value="below-equal" className="text-xs">Below or equal</SelectItem>
+              <SelectItem value="equal" className="text-xs">Equal</SelectItem>
+              <SelectItem value="between" className="text-xs">Between</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {isDateFilter ? (
+          <>
+            <div>
+              <label className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2 block">
+                {condition === 'between' ? 'FROM DATE' : 'DATE'}
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  placeholder="Day"
+                  value={day}
+                  onChange={(e) => setDay(e.target.value)}
+                  className="text-xs"
+                  min="1"
+                  max="31"
+                />
+                <Input
+                  type="number"
+                  placeholder="Month"
+                  value={month}
+                  onChange={(e) => setMonth(e.target.value)}
+                  className="text-xs"
+                  min="1"
+                  max="12"
+                />
+                <Input
+                  type="number"
+                  placeholder="Year"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  className="text-xs"
+                  min="2020"
+                  max="2030"
+                />
+              </div>
+            </div>
+
+            {condition === 'between' && (
               <div>
                 <label className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2 block">
-                  {condition === 'between' ? 'FROM DATE' : 'DATE'}
+                  TO DATE
                 </label>
                 <div className="flex gap-2">
                   <Input
                     type="number"
                     placeholder="Day"
-                    value={day}
-                    onChange={(e) => setDay(e.target.value)}
+                    value={day2}
+                    onChange={(e) => setDay2(e.target.value)}
                     className="text-xs"
                     min="1"
                     max="31"
@@ -109,8 +142,8 @@ const FilterDialog = ({
                   <Input
                     type="number"
                     placeholder="Month"
-                    value={month}
-                    onChange={(e) => setMonth(e.target.value)}
+                    value={month2}
+                    onChange={(e) => setMonth2(e.target.value)}
                     className="text-xs"
                     min="1"
                     max="12"
@@ -118,102 +151,65 @@ const FilterDialog = ({
                   <Input
                     type="number"
                     placeholder="Year"
-                    value={year}
-                    onChange={(e) => setYear(e.target.value)}
+                    value={year2}
+                    onChange={(e) => setYear2(e.target.value)}
                     className="text-xs"
                     min="2020"
                     max="2030"
                   />
                 </div>
               </div>
+            )}
+          </>
+        ) : (
+          <>
+            <div>
+              <label className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2 block">
+                {condition === 'between' ? 'FROM' : 'VALUE'}
+              </label>
+              <Input
+                type="number"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                className="text-xs"
+                placeholder="0"
+              />
+            </div>
 
-              {condition === 'between' && (
-                <div>
-                  <label className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2 block">
-                    TO DATE
-                  </label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="number"
-                      placeholder="Day"
-                      value={day2}
-                      onChange={(e) => setDay2(e.target.value)}
-                      className="text-xs"
-                      min="1"
-                      max="31"
-                    />
-                    <Input
-                      type="number"
-                      placeholder="Month"
-                      value={month2}
-                      onChange={(e) => setMonth2(e.target.value)}
-                      className="text-xs"
-                      min="1"
-                      max="12"
-                    />
-                    <Input
-                      type="number"
-                      placeholder="Year"
-                      value={year2}
-                      onChange={(e) => setYear2(e.target.value)}
-                      className="text-xs"
-                      min="2020"
-                      max="2030"
-                    />
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <>
+            {condition === 'between' && (
               <div>
                 <label className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2 block">
-                  {condition === 'between' ? 'FROM' : 'VALUE'}
+                  TO
                 </label>
                 <Input
                   type="number"
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
+                  value={value2}
+                  onChange={(e) => setValue2(e.target.value)}
                   className="text-xs"
                   placeholder="0"
                 />
               </div>
+            )}
+          </>
+        )}
+      </div>
 
-              {condition === 'between' && (
-                <div>
-                  <label className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2 block">
-                    TO
-                  </label>
-                  <Input
-                    type="number"
-                    value={value2}
-                    onChange={(e) => setValue2(e.target.value)}
-                    className="text-xs"
-                    placeholder="0"
-                  />
-                </div>
-              )}
-            </>
-          )}
-        </div>
-
-        <div className="flex justify-end space-x-2 mt-4">
-          <Button
-            variant="outline"
-            onClick={handleCancel}
-            className="text-xs px-3 py-1 h-8"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleApply}
-            className="text-xs px-3 py-1 h-8"
-          >
-            Apply
-          </Button>
-        </div>
-      </PopoverContent>
-    </Popover>
+      <div className="flex justify-end space-x-2 mt-4">
+        <Button
+          variant="outline"
+          onClick={handleCancel}
+          className="text-xs px-3 py-1 h-8"
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={handleApply}
+          className="text-xs px-3 py-1 h-8"
+        >
+          Apply
+        </Button>
+      </div>
+    </div>
   );
 };
 

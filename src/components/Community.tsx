@@ -325,14 +325,14 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
         <Button
           variant="outline"
           size="sm"
-          className="text-xs h-8 px-3"
+          className="text-xs h-8 px-3 font-medium"
         >
           {label}
           {hasActiveFilter && <span className="ml-1 text-orange-500">•</span>}
           <ChevronDownIcon size={12} className="ml-1" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-4 bg-white border border-gray-200 shadow-lg">
+      <PopoverContent className="p-0 border-0 shadow-none bg-transparent" align="start">
         <FilterDialog
           isOpen={true}
           onClose={() => {}}
@@ -406,7 +406,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
               />
             </div>
             
-            {/* Advanced Filter Buttons */}
+            {/* Advanced Filter Buttons - Updated order */}
             <div className="flex flex-wrap gap-2">
               <FilterButton
                 label="Trades"
@@ -598,10 +598,10 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                 isDateFilter={true}
               />
               <Select value={bestTradesFilters.side} onValueChange={(value) => setBestTradesFilters(prev => ({ ...prev, side: value }))}>
-                <SelectTrigger className="w-20 h-8 text-xs">
+                <SelectTrigger className="w-20 h-8 text-xs font-medium">
                   <SelectValue placeholder="Side" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-200">
+                <SelectContent className="bg-white border border-gray-200 z-50">
                   <SelectItem value="all" className="text-xs">All</SelectItem>
                   <SelectItem value="LONG" className="text-xs">LONG</SelectItem>
                   <SelectItem value="SHORT" className="text-xs">SHORT</SelectItem>
