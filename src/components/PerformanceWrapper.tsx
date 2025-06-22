@@ -28,7 +28,6 @@ const PerformanceWrapper = ({ trades }: PerformanceWrapperProps) => {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold">Performance</h2>
           <p className="text-sm italic text-gray-600 mt-2">
             Sign in to view your performance.
           </p>
