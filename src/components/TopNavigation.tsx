@@ -29,8 +29,8 @@ const TopNavigation = () => {
   };
 
   return (
-    <div className="w-full bg-white border-b border-gray-100 px-6 py-4">
-      <div className="flex items-center justify-between">
+    <div className="w-full bg-white border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
         {/* Left side - TRINKO logo */}
         <div className="flex items-center">
           <h1 className="text-2xl font-black text-gray-900 tracking-tight">TRINKO</h1>
