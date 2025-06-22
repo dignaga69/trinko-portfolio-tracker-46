@@ -14,20 +14,29 @@ interface Trade {
   entryDate: Date;
   reason: string;
   status: 'open' | 'closed';
+  portfolioId: string;
+}
+
+interface Portfolio {
+  id: string;
+  name: string;
+  createdAt: Date;
 }
 
 interface LogTradeProps {
   trades: Trade[];
+  portfolios: Portfolio[];
   onAddTrade: (trade: Omit<Trade, 'id'>) => void;
   onCloseTrade: (tradeId: string, reason: string) => void;
 }
 
-const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
+const LogTrade = ({ trades, portfolios, onAddTrade, onCloseTrade }: LogTradeProps) => {
   const [tradeType, setTradeType] = useState<'open' | 'close'>('open');
   const [ticker, setTicker] = useState('');
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
   const [reason, setReason] = useState('');
   const [selectedTradeId, setSelectedTradeId] = useState('');
+  const [selectedPortfolioId, setSelectedPortfolioId] = useState('');
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -52,7 +61,7 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
   };
 
   const handleOpenTrade = () => {
-    if (!ticker || !reason.trim() || !currentPrice) return;
+    if (!ticker || !reason.trim() || !currentPrice || !selectedPortfolioId) return;
     
     onAddTrade({
       ticker: ticker.toUpperCase(),
@@ -60,7 +69,8 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
       entryPrice: currentPrice,
       entryDate: new Date(),
       reason: reason.trim(),
-      status: 'open'
+      status: 'open',
+      portfolioId: selectedPortfolioId
     });
 
     // Reset form
@@ -81,6 +91,17 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
 
   return (
     <div className="space-y-8">
+      {portfolios.length === 0 && (
+        <Card className="bg-yellow-50 border-yellow-200">
+          <CardContent className="p-6">
+            <p className="text-yellow-800 text-sm">
+              You need to create at least one portfolio before logging trades. 
+              Go to the Portfolio tab to create your first portfolio.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="flex space-x-1 bg-gray-50 p-1 rounded-lg w-fit">
         <button
           onClick={() => setTradeType('open')}
@@ -122,6 +143,25 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* Portfolio Selection */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700">
+              Portfolio
+            </Label>
+            <Select value={selectedPortfolioId} onValueChange={setSelectedPortfolioId}>
+              <SelectTrigger className="text-sm">
+                <SelectValue placeholder="Select a portfolio" />
+              </SelectTrigger>
+              <SelectContent>
+                {portfolios.map((portfolio) => (
+                  <SelectItem key={portfolio.id} value={portfolio.id}>
+                    {portfolio.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {tradeType === 'open' ? (
             <>
               <div className="grid grid-cols-2 gap-4">
@@ -172,11 +212,14 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
                   <SelectValue placeholder="Select an open position" />
                 </SelectTrigger>
                 <SelectContent>
-                  {openTrades.map((trade) => (
-                    <SelectItem key={trade.id} value={trade.id}>
-                      {trade.ticker} - {trade.side.toUpperCase()} @ ${trade.entryPrice.toFixed(2)}
-                    </SelectItem>
-                  ))}
+                  {openTrades.map((trade) => {
+                    const portfolio = portfolios.find(p => p.id === trade.portfolioId);
+                    return (
+                      <SelectItem key={trade.id} value={trade.id}>
+                        {trade.ticker} - {trade.side.toUpperCase()} @ ${trade.entryPrice.toFixed(2)} ({portfolio?.name})
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -203,9 +246,10 @@ const LogTrade = ({ trades, onAddTrade, onCloseTrade }: LogTradeProps) => {
           <Button 
             onClick={tradeType === 'open' ? handleOpenTrade : handleCloseTrade}
             disabled={
-              tradeType === 'open' 
-                ? !ticker || !reason.trim() || !currentPrice 
-                : !selectedTradeId || !reason.trim()
+              portfolios.length === 0 || 
+              (tradeType === 'open' 
+                ? !ticker || !reason.trim() || !currentPrice || !selectedPortfolioId
+                : !selectedTradeId || !reason.trim())
             }
             className="w-full text-sm"
           >

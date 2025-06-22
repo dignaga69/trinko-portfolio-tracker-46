@@ -1,7 +1,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { FileText, BarChart3, Trophy } from 'lucide-react';
+import { FileText, BarChart3, Trophy, Briefcase } from 'lucide-react';
 
 interface SidebarProps {
   activeSection: string;
@@ -12,6 +12,7 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
   const { user, loading } = useAuth();
 
   const menuItems = [
+    { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
     { id: 'log-trade', label: 'Log Trade', icon: FileText },
     { id: 'performance', label: 'Performance', icon: BarChart3 },
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy }

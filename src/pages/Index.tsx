@@ -9,6 +9,7 @@ import PerformanceWrapper from '@/components/PerformanceWrapper';
 import Community from '@/components/Community';
 import Footer from '@/components/Footer';
 import { FileText, BarChart3, Trophy } from 'lucide-react';
+import PortfolioManager from '@/components/PortfolioManager';
 
 interface Trade {
   id: string;
@@ -21,13 +22,53 @@ interface Trade {
   exitPrice?: number;
   exitDate?: Date;
   closeReason?: string;
+  portfolioId: string;
+}
+
+interface Portfolio {
+  id: string;
+  name: string;
+  createdAt: Date;
 }
 
 const Index = () => {
   const { loading } = useAuth();
   const { isPrivate } = usePrivacy();
-  const [activeSection, setActiveSection] = useState('log-trade');
+  const [activeSection, setActiveSection] = useState('portfolio');
   const [trades, setTrades] = useState<Trade[]>([]);
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+  const [selectedPortfolioId, setSelectedPortfolioId] = useState<string>('');
+
+  // Portfolio management functions
+  const handleCreatePortfolio = (name: string) => {
+    const portfolio: Portfolio = {
+      id: Date.now().toString(),
+      name,
+      createdAt: new Date(),
+    };
+    setPortfolios(prev => [...prev, portfolio]);
+    
+    // If this is the first portfolio, select it
+    if (portfolios.length === 0) {
+      setSelectedPortfolioId(portfolio.id);
+    }
+  };
+
+  const handleRenamePortfolio = (id: string, newName: string) => {
+    setPortfolios(prev => prev.map(portfolio => 
+      portfolio.id === id ? { ...portfolio, name: newName } : portfolio
+    ));
+  };
+
+  const handleDeletePortfolio = (id: string) => {
+    setPortfolios(prev => prev.filter(portfolio => portfolio.id !== id));
+    // Remove trades from deleted portfolio
+    setTrades(prev => prev.filter(trade => trade.portfolioId !== id));
+    // If deleted portfolio was selected, clear selection
+    if (selectedPortfolioId === id) {
+      setSelectedPortfolioId('');
+    }
+  };
 
   const handleAddTrade = (newTrade: Omit<Trade, 'id'>) => {
     const trade: Trade = {
@@ -56,6 +97,8 @@ const Index = () => {
 
   const getSectionIcon = () => {
     switch (activeSection) {
+      case 'portfolio':
+        return <FileText size={24} className="mr-2" />;
       case 'log-trade':
         return <FileText size={24} className="mr-2" />;
       case 'performance':
@@ -69,6 +112,8 @@ const Index = () => {
 
   const getSectionTitle = () => {
     switch (activeSection) {
+      case 'portfolio':
+        return 'Portfolio Management';
       case 'log-trade':
         return 'Log Trade';
       case 'performance':
@@ -82,24 +127,42 @@ const Index = () => {
 
   const renderContent = () => {
     switch (activeSection) {
+      case 'portfolio':
+        return (
+          <PortfolioManager
+            portfolios={portfolios}
+            onCreatePortfolio={handleCreatePortfolio}
+            onRenamePortfolio={handleRenamePortfolio}
+            onDeletePortfolio={handleDeletePortfolio}
+          />
+        );
       case 'log-trade':
         return (
           <LogTradeWrapper 
             trades={trades}
+            portfolios={portfolios}
             onAddTrade={handleAddTrade}
             onCloseTrade={handleCloseTrade}
           />
         );
       case 'performance':
-        return <PerformanceWrapper trades={trades} />;
+        return (
+          <PerformanceWrapper 
+            trades={trades} 
+            portfolios={portfolios}
+            selectedPortfolioId={selectedPortfolioId}
+            onPortfolioChange={setSelectedPortfolioId}
+          />
+        );
       case 'leaderboard':
         return <Community isUserPrivate={isPrivate} />;
       default:
         return (
-          <LogTradeWrapper 
-            trades={trades}
-            onAddTrade={handleAddTrade}
-            onCloseTrade={handleCloseTrade}
+          <PortfolioManager
+            portfolios={portfolios}
+            onCreatePortfolio={handleCreatePortfolio}
+            onRenamePortfolio={handleRenamePortfolio}
+            onDeletePortfolio={handleDeletePortfolio}
           />
         );
     }

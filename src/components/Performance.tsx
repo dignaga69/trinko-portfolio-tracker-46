@@ -6,6 +6,7 @@ import { Edit2, Twitter, Linkedin } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { usePrivacy } from '@/contexts/PrivacyContext';
 import PrivacyToggle from './PrivacyToggle';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Trade {
   id: string;
@@ -18,14 +19,29 @@ interface Trade {
   exitPrice?: number;
   exitDate?: Date;
   closeReason?: string;
+  portfolioId: string;
+}
+
+interface Portfolio {
+  id: string;
+  name: string;
+  createdAt: Date;
 }
 
 interface PerformanceProps {
   trades: Trade[];
+  portfolios: Portfolio[];
+  selectedPortfolioId: string;
+  onPortfolioChange: (portfolioId: string) => void;
 }
 
-const Performance = ({ trades }: PerformanceProps) => {
+const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChange }: PerformanceProps) => {
   const { isPrivate, setIsPrivate } = usePrivacy();
+
+  // Filter trades by selected portfolio
+  const filteredTrades = selectedPortfolioId 
+    ? trades.filter(trade => trade.portfolioId === selectedPortfolioId)
+    : trades;
 
   const calculateReturns = (trade: Trade) => {
     if (trade.status === 'open') {
@@ -51,14 +67,14 @@ const Performance = ({ trades }: PerformanceProps) => {
     return { tickerReturn, sp500Return, alpha };
   };
 
-  const closedTrades = trades.filter(trade => trade.status === 'closed');
-  const openTrades = trades.filter(trade => trade.status === 'open');
+  const closedTrades = filteredTrades.filter(trade => trade.status === 'closed');
+  const openTrades = filteredTrades.filter(trade => trade.status === 'open');
   const successfulTrades = closedTrades.filter(trade => {
     const returns = calculateReturns(trade);
     return returns.tickerReturn! > 0;
   });
   
-  const allSuccessfulTrades = trades.filter(trade => {
+  const allSuccessfulTrades = filteredTrades.filter(trade => {
     if (trade.status === 'open') return false;
     const returns = calculateReturns(trade);
     return returns.tickerReturn! > 0;
@@ -72,14 +88,47 @@ const Performance = ({ trades }: PerformanceProps) => {
   const averageAlphaAll = allAlphaValues.length > 0 ? allAlphaValues.reduce((sum, alpha) => sum + alpha, 0) / allAlphaValues.length : 0;
   const averageAlphaClosed = averageAlphaAll;
 
-  const totalTrades = trades.length;
+  const totalTrades = filteredTrades.length;
   const successRateAll = totalTrades > 0 ? (allSuccessfulTrades.length / totalTrades) * 100 : 0;
   const successRateClosed = closedTrades.length > 0 ? (successfulTrades.length / closedTrades.length) * 100 : 0;
+
+  const selectedPortfolio = portfolios.find(p => p.id === selectedPortfolioId);
 
   return (
     <div className="space-y-6">
       {/* Privacy Toggle */}
       <PrivacyToggle isPrivate={isPrivate} onToggle={setIsPrivate} />
+
+      {/* Portfolio Selector */}
+      <Card className="border-0 shadow-none bg-gray-50">
+        <CardContent className="pt-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium text-gray-700">
+                Select Portfolio
+              </Label>
+              <Select value={selectedPortfolioId} onValueChange={onPortfolioChange}>
+                <SelectTrigger className="w-64">
+                  <SelectValue placeholder="All Portfolios" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Portfolios</SelectItem>
+                  {portfolios.map((portfolio) => (
+                    <SelectItem key={portfolio.id} value={portfolio.id}>
+                      {portfolio.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {selectedPortfolio && (
+              <p className="text-sm text-gray-600">
+                Viewing performance for: <span className="font-medium">{selectedPortfolio.name}</span>
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Profile Section */}
       <Card className="border-0 shadow-none bg-gray-50">
@@ -128,7 +177,7 @@ const Performance = ({ trades }: PerformanceProps) => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Overview</CardTitle>
           <p className="text-sm italic text-gray-600 mt-2">
-            Your basic stats at a glance.
+            Your basic stats at a glance{selectedPortfolio ? ` for ${selectedPortfolio.name}` : ''}.
           </p>
         </CardHeader>
         <CardContent>
@@ -137,7 +186,7 @@ const Performance = ({ trades }: PerformanceProps) => {
               <div className="space-y-4">
                 <h4 className="text-sm font-semibold text-gray-700 text-center border-b border-gray-200 pb-2">Number of Trades</h4>
                 <div className="text-center">
-                  <div className="text-xl font-bold text-gray-900">{totalTrades}</div>
+                  <div className="text-xl font-bold text-gray-900">{filteredTrades.length}</div>
                   <div className="text-xs text-gray-600">Total</div>
                 </div>
                 <div className="text-center">
@@ -195,15 +244,21 @@ const Performance = ({ trades }: PerformanceProps) => {
           <CardTitle className="text-lg font-semibold">Trade History</CardTitle>
         </CardHeader>
         <CardContent>
-          {trades.length === 0 ? (
+          {filteredTrades.length === 0 ? (
             <p className="text-sm text-gray-500 text-center py-8">
-              No trades logged yet. Start by logging your first trade.
+              {selectedPortfolio 
+                ? `No trades found for ${selectedPortfolio.name}.`
+                : 'No trades logged yet. Start by logging your first trade.'
+              }
             </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
+                    <th className="text-left py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                      Portfolio
+                    </th>
                     <th className="text-left py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
                       Ticker
                     </th>
@@ -234,10 +289,14 @@ const Performance = ({ trades }: PerformanceProps) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {trades.map((trade) => {
+                  {filteredTrades.map((trade) => {
                     const returns = calculateReturns(trade);
+                    const portfolio = portfolios.find(p => p.id === trade.portfolioId);
                     return (
                       <tr key={trade.id} className="border-b border-gray-100 hover:bg-gray-25">
+                        <td className="py-3 px-2 text-sm text-gray-600 font-mono">
+                          {portfolio?.name || 'Unknown'}
+                        </td>
                         <td className="py-3 px-2 text-sm font-medium text-gray-900 font-mono">
                           {trade.ticker}
                         </td>

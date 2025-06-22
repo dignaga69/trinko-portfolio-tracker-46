@@ -15,15 +15,23 @@ interface Trade {
   exitPrice?: number;
   exitDate?: Date;
   closeReason?: string;
+  portfolioId: string;
+}
+
+interface Portfolio {
+  id: string;
+  name: string;
+  createdAt: Date;
 }
 
 interface LogTradeWrapperProps {
   trades: Trade[];
+  portfolios: Portfolio[];
   onAddTrade: (trade: Omit<Trade, 'id'>) => void;
   onCloseTrade: (tradeId: string, reason: string) => void;
 }
 
-const LogTradeWrapper = ({ trades, onAddTrade, onCloseTrade }: LogTradeWrapperProps) => {
+const LogTradeWrapper = ({ trades, portfolios, onAddTrade, onCloseTrade }: LogTradeWrapperProps) => {
   const { user } = useAuth();
 
   if (!user) {
@@ -46,7 +54,7 @@ const LogTradeWrapper = ({ trades, onAddTrade, onCloseTrade }: LogTradeWrapperPr
     );
   }
 
-  return <LogTrade trades={trades} onAddTrade={onAddTrade} onCloseTrade={onCloseTrade} />;
+  return <LogTrade trades={trades} portfolios={portfolios} onAddTrade={onAddTrade} onCloseTrade={onCloseTrade} />;
 };
 
 export default LogTradeWrapper;

@@ -15,13 +15,23 @@ interface Trade {
   exitPrice?: number;
   exitDate?: Date;
   closeReason?: string;
+  portfolioId: string;
+}
+
+interface Portfolio {
+  id: string;
+  name: string;
+  createdAt: Date;
 }
 
 interface PerformanceWrapperProps {
   trades: Trade[];
+  portfolios: Portfolio[];
+  selectedPortfolioId: string;
+  onPortfolioChange: (portfolioId: string) => void;
 }
 
-const PerformanceWrapper = ({ trades }: PerformanceWrapperProps) => {
+const PerformanceWrapper = ({ trades, portfolios, selectedPortfolioId, onPortfolioChange }: PerformanceWrapperProps) => {
   const { user } = useAuth();
 
   if (!user) {
@@ -44,7 +54,14 @@ const PerformanceWrapper = ({ trades }: PerformanceWrapperProps) => {
     );
   }
 
-  return <Performance trades={trades} />;
+  return (
+    <Performance 
+      trades={trades} 
+      portfolios={portfolios}
+      selectedPortfolioId={selectedPortfolioId}
+      onPortfolioChange={onPortfolioChange}
+    />
+  );
 };
 
 export default PerformanceWrapper;
