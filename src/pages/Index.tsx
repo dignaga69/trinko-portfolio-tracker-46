@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -113,7 +114,7 @@ const Index = () => {
   const getSectionTitle = () => {
     switch (activeSection) {
       case 'portfolio':
-        return 'Portfolio Management';
+        return 'Portfolio';
       case 'log-trade':
         return 'Log Trade';
       case 'performance':

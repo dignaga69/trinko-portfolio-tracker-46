@@ -1,5 +1,3 @@
-
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -167,11 +165,6 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
                 </SelectContent>
               </Select>
             </div>
-            {selectedPortfolio && (
-              <p className="text-sm text-gray-600">
-                Viewing performance for: <span className="font-medium">{selectedPortfolio.name}</span>
-              </p>
-            )}
           </div>
         </CardContent>
       </Card>
@@ -383,4 +376,3 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
 };
 
 export default Performance;
-
