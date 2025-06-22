@@ -1,4 +1,5 @@
 
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -41,7 +42,7 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
   const { isPrivate, setIsPrivate } = usePrivacy();
 
   // Filter trades by selected portfolio
-  const filteredTrades = selectedPortfolioId 
+  const filteredTrades = selectedPortfolioId && selectedPortfolioId !== 'all'
     ? trades.filter(trade => trade.portfolioId === selectedPortfolioId)
     : trades;
 
@@ -109,12 +110,12 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
               <Label className="text-sm font-medium text-gray-700">
                 Select Portfolio
               </Label>
-              <Select value={selectedPortfolioId} onValueChange={onPortfolioChange}>
+              <Select value={selectedPortfolioId || 'all'} onValueChange={onPortfolioChange}>
                 <SelectTrigger className="w-64">
                   <SelectValue placeholder="All Portfolios" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Portfolios</SelectItem>
+                  <SelectItem value="all">All Portfolios</SelectItem>
                   {portfolios.map((portfolio) => (
                     <SelectItem key={portfolio.id} value={portfolio.id}>
                       {portfolio.name}
@@ -382,3 +383,4 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
 };
 
 export default Performance;
+
