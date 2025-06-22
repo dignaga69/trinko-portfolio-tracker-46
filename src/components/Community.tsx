@@ -385,7 +385,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
       <Card className="border-0 shadow-none bg-gray-50 relative">
         {isUserPrivate && <PrivacyOverlay />}
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">Leaderboard</CardTitle>
+          <CardTitle className="text-lg font-semibold">Top Users</CardTitle>
           <p className="text-sm italic text-gray-600 mt-2">
             The best shot-callers.
           </p>
@@ -551,9 +551,9 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
       <Card className="border-0 shadow-none bg-gray-50 relative">
         {isUserPrivate && <PrivacyOverlay />}
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">Best Trades</CardTitle>
+          <CardTitle className="text-lg font-semibold">Top Trades</CardTitle>
           <p className="text-sm italic text-gray-600 mt-2">
-            The best calls for each timeframe.
+            The best trades.
           </p>
         </CardHeader>
         <CardContent>
