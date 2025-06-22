@@ -108,14 +108,14 @@ const Index = () => {
   // Show loading state while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground">Loading...</div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-gray-500">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <TopNavigation />
       
       {/* Center the entire app with max width and horizontal margins */}
@@ -131,7 +131,7 @@ const Index = () => {
               {/* Section Header */}
               <div className="flex items-center mb-6">
                 {getSectionIcon()}
-                <h1 className="text-2xl font-bold text-foreground">{getSectionTitle()}</h1>
+                <h1 className="text-2xl font-bold">{getSectionTitle()}</h1>
               </div>
               
               {renderContent()}
