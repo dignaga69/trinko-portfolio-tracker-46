@@ -28,12 +28,21 @@ const TopNavigation = () => {
     navigate('/auth');
   };
 
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+
   return (
     <div className="w-full bg-white border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
         {/* Left side - TRINKO logo */}
         <div className="flex items-center">
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight">TRINKO</h1>
+          <h1 
+            className="text-2xl font-black text-gray-900 tracking-tight cursor-pointer hover:text-gray-700 transition-colors"
+            onClick={handleLogoClick}
+          >
+            TRINKO
+          </h1>
         </div>
         
         {/* Right side - User controls */}
