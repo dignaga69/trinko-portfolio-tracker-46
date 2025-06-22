@@ -30,7 +30,7 @@ const LogTradeWrapper = ({ trades, onAddTrade, onCloseTrade }: LogTradeWrapperPr
     return (
       <div className="space-y-6">
         <div>
-          <p className="text-sm italic text-gray-600 mt-2">
+          <className="text-sm italic text-gray-600 mt-2">
             Sign in to log your trades.
           </p>
         </div>
