@@ -26,7 +26,7 @@ const Landing = () => {
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center space-y-6 max-w-2xl px-8">
           <h1 className="text-[6rem] font-black text-gray-900 tracking-tight leading-none">
-            NYSEARCA: SPY
+            SPY
           </h1>
           
           <h2 className="text-3xl font-bold text-gray-800">
