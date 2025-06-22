@@ -32,12 +32,12 @@ const TopNavigation = () => {
     <div className="w-full bg-white border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
         {/* Left side - TRINKO logo */}
-        <div className="flex items-center ml-8">
+        <div className="flex items-center">
           <h1 className="text-2xl font-black text-gray-900 tracking-tight">TRINKO</h1>
         </div>
         
         {/* Right side - User controls */}
-        <div className="flex items-center space-x-4 mr-8">
+        <div className="flex items-center space-x-4">
           {user ? (
             <>
               <Popover>
