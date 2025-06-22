@@ -99,40 +99,6 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
 
   return (
     <div className="space-y-6">
-      {/* Privacy Toggle */}
-      <PrivacyToggle isPrivate={isPrivate} onToggle={setIsPrivate} />
-
-      {/* Portfolio Selector */}
-      <Card className="border-0 shadow-none bg-gray-50">
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium text-gray-700">
-                Select Portfolio
-              </Label>
-              <Select value={selectedPortfolioId || 'all'} onValueChange={onPortfolioChange}>
-                <SelectTrigger className="w-64">
-                  <SelectValue placeholder="All Portfolios" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Portfolios</SelectItem>
-                  {portfolios.map((portfolio) => (
-                    <SelectItem key={portfolio.id} value={portfolio.id}>
-                      {portfolio.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            {selectedPortfolio && (
-              <p className="text-sm text-gray-600">
-                Viewing performance for: <span className="font-medium">{selectedPortfolio.name}</span>
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Profile Section */}
       <Card className="border-0 shadow-none bg-gray-50">
         <CardContent className="pt-6">
@@ -172,6 +138,40 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
                 </Button>
               </div>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Privacy Toggle */}
+      <PrivacyToggle isPrivate={isPrivate} onToggle={setIsPrivate} />
+
+      {/* Portfolio Selector */}
+      <Card className="border-0 shadow-none bg-gray-50">
+        <CardContent className="pt-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium text-gray-700">
+                Select Portfolio
+              </Label>
+              <Select value={selectedPortfolioId || 'all'} onValueChange={onPortfolioChange}>
+                <SelectTrigger className="w-64">
+                  <SelectValue placeholder="All Portfolios" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Portfolios</SelectItem>
+                  {portfolios.map((portfolio) => (
+                    <SelectItem key={portfolio.id} value={portfolio.id}>
+                      {portfolio.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {selectedPortfolio && (
+              <p className="text-sm text-gray-600">
+                Viewing performance for: <span className="font-medium">{selectedPortfolio.name}</span>
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
