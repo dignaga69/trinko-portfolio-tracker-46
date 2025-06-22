@@ -37,7 +37,7 @@ const TopNavigation = () => {
         </div>
         
         {/* Right side - User controls */}
-        <div className="flex items-center space-x-4 mr-3">
+        <div className="flex items-center space-x-4 mr-8">
           {user ? (
             <>
               <Popover>
