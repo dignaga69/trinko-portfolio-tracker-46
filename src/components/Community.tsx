@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -129,7 +128,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
       if (bestTradesFilters.ticker && !item.ticker.toLowerCase().includes(bestTradesFilters.ticker.toLowerCase())) return false;
       if (bestTradesFilters.entryDateFrom && new Date(item.entryDate) < new Date(bestTradesFilters.entryDateFrom)) return false;
       if (bestTradesFilters.entryDateTo && new Date(item.entryDate) > new Date(bestTradesFilters.entryDateTo)) return false;
-      if (bestTradesFilters.side && item.side !== bestTradesFilters.side) return false;
+      if (bestTradesFilters.side && bestTradesFilters.side !== 'all' && item.side !== bestTradesFilters.side) return false;
       if (bestTradesFilters.closeDate && new Date(item.closeDate) < new Date(bestTradesFilters.closeDate)) return false;
       if (bestTradesFilters.closeDateTo && new Date(item.closeDate) > new Date(bestTradesFilters.closeDateTo)) return false;
       if (bestTradesFilters.tickerReturnMin && item.tickerReturn < Number(bestTradesFilters.tickerReturnMin)) return false;
@@ -558,7 +557,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                     <SelectValue placeholder="Side" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All</SelectItem>
+                    <SelectItem value="all">All</SelectItem>
                     <SelectItem value="LONG">LONG</SelectItem>
                     <SelectItem value="SHORT">SHORT</SelectItem>
                   </SelectContent>
@@ -625,7 +624,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                     <TableHead className="text-center px-2">
                       <SortButton 
                         label="ENTRY DATE" 
-                        sortKey="entryDate" 
+                        sortKey="entryDate"
                         currentSortConfig={bestTradesSortConfig}
                         onSort={handleBestTradesSort}
                       />
