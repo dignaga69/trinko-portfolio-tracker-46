@@ -1,10 +1,9 @@
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface FilterDialogProps {
   isOpen: boolean;
@@ -14,6 +13,7 @@ interface FilterDialogProps {
   currentCondition?: string;
   currentValue?: string;
   currentValue2?: string;
+  isDateFilter?: boolean;
 }
 
 const FilterDialog = ({ 
@@ -23,14 +23,29 @@ const FilterDialog = ({
   onApply, 
   currentCondition = 'above-equal',
   currentValue = '',
-  currentValue2 = ''
+  currentValue2 = '',
+  isDateFilter = false
 }: FilterDialogProps) => {
   const [condition, setCondition] = useState(currentCondition);
   const [value, setValue] = useState(currentValue);
   const [value2, setValue2] = useState(currentValue2);
+  
+  // For date filters
+  const [day, setDay] = useState('');
+  const [month, setMonth] = useState('');
+  const [year, setYear] = useState('');
+  const [day2, setDay2] = useState('');
+  const [month2, setMonth2] = useState('');
+  const [year2, setYear2] = useState('');
 
   const handleApply = () => {
-    onApply(condition, value, value2);
+    if (isDateFilter) {
+      const dateValue = year && month && day ? `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}` : '';
+      const dateValue2 = year2 && month2 && day2 ? `${year2}-${month2.padStart(2, '0')}-${day2.padStart(2, '0')}` : '';
+      onApply(condition, dateValue, dateValue2);
+    } else {
+      onApply(condition, value, value2);
+    }
     onClose();
   };
 
@@ -38,85 +53,167 @@ const FilterDialog = ({
     setCondition(currentCondition);
     setValue(currentValue);
     setValue2(currentValue2);
+    if (isDateFilter) {
+      setDay('');
+      setMonth('');
+      setYear('');
+      setDay2('');
+      setMonth2('');
+      setYear2('');
+    }
     onClose();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-gray-900 text-white border-gray-700">
-        <DialogHeader className="border-b border-gray-700 pb-4 mb-4">
-          <div className="flex items-center">
-            <ChevronLeft className="h-5 w-5 mr-2" />
-            <DialogTitle className="text-lg font-semibold">Manual setup</DialogTitle>
-          </div>
-        </DialogHeader>
-        
-        <div className="space-y-4">
+    <Popover open={isOpen} onOpenChange={onClose}>
+      <PopoverTrigger asChild>
+        <div />
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-4 bg-white border border-gray-200 shadow-lg">
+        <div className="space-y-3">
           <div>
-            <label className="text-sm text-gray-400 uppercase tracking-wide mb-2 block">
+            <label className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2 block">
               {title}
             </label>
             <Select value={condition} onValueChange={setCondition}>
-              <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+              <SelectTrigger className="text-xs">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
-                <SelectItem value="above">Above</SelectItem>
-                <SelectItem value="above-equal">Above or equal</SelectItem>
-                <SelectItem value="below">Below</SelectItem>
-                <SelectItem value="below-equal">Below or equal</SelectItem>
-                <SelectItem value="equal">Equal</SelectItem>
-                <SelectItem value="between">Between</SelectItem>
+              <SelectContent className="bg-white border border-gray-200">
+                <SelectItem value="above" className="text-xs">Above</SelectItem>
+                <SelectItem value="above-equal" className="text-xs">Above or equal</SelectItem>
+                <SelectItem value="below" className="text-xs">Below</SelectItem>
+                <SelectItem value="below-equal" className="text-xs">Below or equal</SelectItem>
+                <SelectItem value="equal" className="text-xs">Equal</SelectItem>
+                <SelectItem value="between" className="text-xs">Between</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div>
-            <label className="text-sm text-gray-400 uppercase tracking-wide mb-2 block">
-              {condition === 'between' ? 'FROM' : 'VALUE'}
-            </label>
-            <Input
-              type="number"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              className="bg-gray-800 border-gray-600 text-white"
-              placeholder="0"
-            />
-          </div>
+          {isDateFilter ? (
+            <>
+              <div>
+                <label className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2 block">
+                  {condition === 'between' ? 'FROM DATE' : 'DATE'}
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    placeholder="Day"
+                    value={day}
+                    onChange={(e) => setDay(e.target.value)}
+                    className="text-xs"
+                    min="1"
+                    max="31"
+                  />
+                  <Input
+                    type="number"
+                    placeholder="Month"
+                    value={month}
+                    onChange={(e) => setMonth(e.target.value)}
+                    className="text-xs"
+                    min="1"
+                    max="12"
+                  />
+                  <Input
+                    type="number"
+                    placeholder="Year"
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                    className="text-xs"
+                    min="2020"
+                    max="2030"
+                  />
+                </div>
+              </div>
 
-          {condition === 'between' && (
-            <div>
-              <label className="text-sm text-gray-400 uppercase tracking-wide mb-2 block">
-                TO
-              </label>
-              <Input
-                type="number"
-                value={value2}
-                onChange={(e) => setValue2(e.target.value)}
-                className="bg-gray-800 border-gray-600 text-white"
-                placeholder="0"
-              />
-            </div>
+              {condition === 'between' && (
+                <div>
+                  <label className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2 block">
+                    TO DATE
+                  </label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="number"
+                      placeholder="Day"
+                      value={day2}
+                      onChange={(e) => setDay2(e.target.value)}
+                      className="text-xs"
+                      min="1"
+                      max="31"
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Month"
+                      value={month2}
+                      onChange={(e) => setMonth2(e.target.value)}
+                      className="text-xs"
+                      min="1"
+                      max="12"
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Year"
+                      value={year2}
+                      onChange={(e) => setYear2(e.target.value)}
+                      className="text-xs"
+                      min="2020"
+                      max="2030"
+                    />
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <div>
+                <label className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2 block">
+                  {condition === 'between' ? 'FROM' : 'VALUE'}
+                </label>
+                <Input
+                  type="number"
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  className="text-xs"
+                  placeholder="0"
+                />
+              </div>
+
+              {condition === 'between' && (
+                <div>
+                  <label className="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2 block">
+                    TO
+                  </label>
+                  <Input
+                    type="number"
+                    value={value2}
+                    onChange={(e) => setValue2(e.target.value)}
+                    className="text-xs"
+                    placeholder="0"
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
 
-        <div className="flex justify-end space-x-3 mt-6">
+        <div className="flex justify-end space-x-2 mt-4">
           <Button
             variant="outline"
             onClick={handleCancel}
-            className="bg-transparent border-gray-600 text-white hover:bg-gray-800"
+            className="text-xs px-3 py-1 h-8"
           >
             Cancel
           </Button>
           <Button
             onClick={handleApply}
-            className="bg-white text-black hover:bg-gray-200"
+            className="text-xs px-3 py-1 h-8"
           >
             Apply
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </PopoverContent>
+    </Popover>
   );
 };
 

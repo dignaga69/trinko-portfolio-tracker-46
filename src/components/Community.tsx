@@ -6,7 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { ChevronUp, ChevronDown, EyeOff, Search, Filter } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ChevronUp, ChevronDown, EyeOff, Search, ChevronDown as ChevronDownIcon } from 'lucide-react';
 import FilterDialog from './FilterDialog';
 
 interface CommunityProps {
@@ -295,6 +296,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
       [filterKey]: { condition, value, value2: value2 || '' }
     }));
     setLeaderboardPage(1);
+    setActiveFilterDialog(null);
   };
 
   const handleBestTradesFilter = (filterKey: string, condition: string, value: string, value2?: string) => {
@@ -303,30 +305,60 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
       [filterKey]: { condition, value, value2: value2 || '' }
     }));
     setBestTradesPage(1);
+    setActiveFilterDialog(null);
   };
 
-  const SortButton = ({ 
+  const FilterButton = ({ 
     label, 
-    sortKey, 
-    currentSortConfig, 
-    onSort 
+    filterKey, 
+    hasActiveFilter,
+    isDateFilter = false
   }: { 
     label: string; 
-    sortKey: string; 
-    currentSortConfig: { key: string; direction: 'asc' | 'desc' };
-    onSort: (key: string) => void;
+    filterKey: string; 
+    hasActiveFilter: boolean;
+    isDateFilter?: boolean;
   }) => (
-    <button
-      onClick={() => onSort(sortKey)}
-      className="flex items-center gap-1 hover:text-gray-900 font-medium text-xs"
-    >
-      {label}
-      {currentSortConfig.key === sortKey && (
-        currentSortConfig.direction === 'desc' ? 
-          <ChevronDown size={12} /> : 
-          <ChevronUp size={12} />
-      )}
-    </button>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs h-8 px-3"
+        >
+          {label}
+          {hasActiveFilter && <span className="ml-1 text-orange-500">•</span>}
+          <ChevronDownIcon size={12} className="ml-1" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-4 bg-white border border-gray-200 shadow-lg">
+        <FilterDialog
+          isOpen={true}
+          onClose={() => {}}
+          title={label}
+          onApply={(condition, value, value2) => {
+            if (filterKey.startsWith('leaderboard-')) {
+              handleLeaderboardFilter(filterKey.replace('leaderboard-', ''), condition, value, value2);
+            } else {
+              handleBestTradesFilter(filterKey.replace('bestTrades-', ''), condition, value, value2);
+            }
+          }}
+          currentCondition={filterKey.startsWith('leaderboard-') ? 
+            leaderboardFilters[filterKey.replace('leaderboard-', '') as keyof typeof leaderboardFilters]?.condition :
+            bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters]?.condition
+          }
+          currentValue={filterKey.startsWith('leaderboard-') ? 
+            leaderboardFilters[filterKey.replace('leaderboard-', '') as keyof typeof leaderboardFilters]?.value :
+            bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters]?.value
+          }
+          currentValue2={filterKey.startsWith('leaderboard-') ? 
+            leaderboardFilters[filterKey.replace('leaderboard-', '') as keyof typeof leaderboardFilters]?.value2 :
+            bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters]?.value2
+          }
+          isDateFilter={isDateFilter}
+        />
+      </PopoverContent>
+    </Popover>
   );
 
   const PrivacyOverlay = () => (
@@ -372,56 +404,31 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
             
             {/* Advanced Filter Buttons */}
             <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setActiveFilterDialog('leaderboard-trades')}
-                className="text-xs"
-              >
-                <Filter size={14} className="mr-1" />
-                Trades
-                {leaderboardFilters.trades.condition && <span className="ml-1 text-orange-500">•</span>}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setActiveFilterDialog('leaderboard-successRateAll')}
-                className="text-xs"
-              >
-                <Filter size={14} className="mr-1" />
-                Success Rate (All)
-                {leaderboardFilters.successRateAll.condition && <span className="ml-1 text-orange-500">•</span>}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setActiveFilterDialog('leaderboard-avgAlphaAll')}
-                className="text-xs"
-              >
-                <Filter size={14} className="mr-1" />
-                Avg Alpha (All)
-                {leaderboardFilters.avgAlphaAll.condition && <span className="ml-1 text-orange-500">•</span>}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setActiveFilterDialog('leaderboard-successRateClosed')}
-                className="text-xs"
-              >
-                <Filter size={14} className="mr-1" />
-                Success Rate (Closed)
-                {leaderboardFilters.successRateClosed.condition && <span className="ml-1 text-orange-500">•</span>}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setActiveFilterDialog('leaderboard-avgAlphaClosed')}
-                className="text-xs"
-              >
-                <Filter size={14} className="mr-1" />
-                Avg Alpha (Closed)
-                {leaderboardFilters.avgAlphaClosed.condition && <span className="ml-1 text-orange-500">•</span>}
-              </Button>
+              <FilterButton
+                label="Trades"
+                filterKey="leaderboard-trades"
+                hasActiveFilter={!!leaderboardFilters.trades.condition}
+              />
+              <FilterButton
+                label="Success Rate (All)"
+                filterKey="leaderboard-successRateAll"
+                hasActiveFilter={!!leaderboardFilters.successRateAll.condition}
+              />
+              <FilterButton
+                label="Avg Alpha (All)"
+                filterKey="leaderboard-avgAlphaAll"
+                hasActiveFilter={!!leaderboardFilters.avgAlphaAll.condition}
+              />
+              <FilterButton
+                label="Success Rate (Closed)"
+                filterKey="leaderboard-successRateClosed"
+                hasActiveFilter={!!leaderboardFilters.successRateClosed.condition}
+              />
+              <FilterButton
+                label="Avg Alpha (Closed)"
+                filterKey="leaderboard-avgAlphaClosed"
+                hasActiveFilter={!!leaderboardFilters.avgAlphaClosed.condition}
+              />
             </div>
 
             <div className="rounded-md border">
@@ -572,48 +579,35 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
               />
             </div>
             
-            {/* Advanced Filter Buttons */}
+            {/* Advanced Filter Buttons - Updated order */}
             <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setActiveFilterDialog('bestTrades-entryDate')}
-                className="text-xs"
-              >
-                <Filter size={14} className="mr-1" />
-                Entry Date
-                {bestTradesFilters.entryDate.condition && <span className="ml-1 text-orange-500">•</span>}
-              </Button>
+              <FilterButton
+                label="Entry Date"
+                filterKey="bestTrades-entryDate"
+                hasActiveFilter={!!bestTradesFilters.entryDate.condition}
+                isDateFilter={true}
+              />
+              <FilterButton
+                label="Close Date"
+                filterKey="bestTrades-closeDate"
+                hasActiveFilter={!!bestTradesFilters.closeDate.condition}
+                isDateFilter={true}
+              />
               <Select value={bestTradesFilters.side} onValueChange={(value) => setBestTradesFilters(prev => ({ ...prev, side: value }))}>
-                <SelectTrigger className="w-24 h-8 text-xs">
+                <SelectTrigger className="w-20 h-8 text-xs">
                   <SelectValue placeholder="Side" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="LONG">LONG</SelectItem>
-                  <SelectItem value="SHORT">SHORT</SelectItem>
+                <SelectContent className="bg-white border border-gray-200">
+                  <SelectItem value="all" className="text-xs">All</SelectItem>
+                  <SelectItem value="LONG" className="text-xs">LONG</SelectItem>
+                  <SelectItem value="SHORT" className="text-xs">SHORT</SelectItem>
                 </SelectContent>
               </Select>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setActiveFilterDialog('bestTrades-closeDate')}
-                className="text-xs"
-              >
-                <Filter size={14} className="mr-1" />
-                Close Date
-                {bestTradesFilters.closeDate.condition && <span className="ml-1 text-orange-500">•</span>}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setActiveFilterDialog('bestTrades-alpha')}
-                className="text-xs"
-              >
-                <Filter size={14} className="mr-1" />
-                Alpha
-                {bestTradesFilters.alpha.condition && <span className="ml-1 text-orange-500">•</span>}
-              </Button>
+              <FilterButton
+                label="Alpha"
+                filterKey="bestTrades-alpha"
+                hasActiveFilter={!!bestTradesFilters.alpha.condition}
+              />
             </div>
 
             <div className="rounded-md border">
