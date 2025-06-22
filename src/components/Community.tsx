@@ -7,9 +7,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { ChevronUp, ChevronDown, EyeOff, Search, Filter } from 'lucide-react';
+import FilterDialog from './FilterDialog';
 
 interface CommunityProps {
   isUserPrivate?: boolean;
+}
+
+interface FilterState {
+  condition: string;
+  value: string;
+  value2?: string;
 }
 
 const Community = ({ isUserPrivate = false }: CommunityProps) => {
@@ -33,34 +40,25 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
   const [leaderboardSearch, setLeaderboardSearch] = useState('');
   const [bestTradesSearch, setBestTradesSearch] = useState('');
 
-  // Filter states for Leaderboard
+  // Advanced filter states for Leaderboard
   const [leaderboardFilters, setLeaderboardFilters] = useState({
-    tradesMin: '',
-    tradesMax: '',
-    successRateAllMin: '',
-    successRateAllMax: '',
-    avgAlphaAllMin: '',
-    avgAlphaAllMax: '',
-    successRateClosedMin: '',
-    successRateClosedMax: '',
-    avgAlphaClosedMin: '',
-    avgAlphaClosedMax: ''
+    trades: { condition: '', value: '', value2: '' },
+    successRateAll: { condition: '', value: '', value2: '' },
+    avgAlphaAll: { condition: '', value: '', value2: '' },
+    successRateClosed: { condition: '', value: '', value2: '' },
+    avgAlphaClosed: { condition: '', value: '', value2: '' }
   });
 
-  // Filter states for Best Trades
+  // Advanced filter states for Best Trades
   const [bestTradesFilters, setBestTradesFilters] = useState({
-    ticker: '',
-    entryDateFrom: '',
-    entryDateTo: '',
+    entryDate: { condition: '', value: '', value2: '' },
     side: '',
-    closeDate: '',
-    closeDateTo: '',
-    tickerReturnMin: '',
-    tickerReturnMax: '',
-    alphaMin: '',
-    alphaMax: '',
-    user: ''
+    closeDate: { condition: '', value: '', value2: '' },
+    alpha: { condition: '', value: '', value2: '' }
   });
+
+  // Dialog states
+  const [activeFilterDialog, setActiveFilterDialog] = useState<string | null>(null);
 
   // Mock data for Best Trades (expanded for pagination demo)
   const mockBestTrades = Array.from({ length: 50 }, (_, i) => ({
@@ -86,6 +84,56 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
     avgAlphaClosed: -3 + (i % 20),
   }));
 
+  // Filter helper function
+  const checkFilterCondition = (value: number, filter: FilterState): boolean => {
+    if (!filter.condition || !filter.value) return true;
+    
+    const filterValue = Number(filter.value);
+    const filterValue2 = filter.value2 ? Number(filter.value2) : 0;
+    
+    switch (filter.condition) {
+      case 'above':
+        return value > filterValue;
+      case 'above-equal':
+        return value >= filterValue;
+      case 'below':
+        return value < filterValue;
+      case 'below-equal':
+        return value <= filterValue;
+      case 'equal':
+        return value === filterValue;
+      case 'between':
+        return value >= filterValue && value <= filterValue2;
+      default:
+        return true;
+    }
+  };
+
+  const checkDateFilterCondition = (dateStr: string, filter: FilterState): boolean => {
+    if (!filter.condition || !filter.value) return true;
+    
+    const date = new Date(dateStr);
+    const filterDate = new Date(filter.value);
+    const filterDate2 = filter.value2 ? new Date(filter.value2) : new Date();
+    
+    switch (filter.condition) {
+      case 'above':
+        return date > filterDate;
+      case 'above-equal':
+        return date >= filterDate;
+      case 'below':
+        return date < filterDate;
+      case 'below-equal':
+        return date <= filterDate;
+      case 'equal':
+        return date.toDateString() === filterDate.toDateString();
+      case 'between':
+        return date >= filterDate && date <= filterDate2;
+      default:
+        return true;
+    }
+  };
+
   const handleBestTradesSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'desc';
     if (bestTradesSortConfig.key === key && bestTradesSortConfig.direction === 'desc') {
@@ -104,38 +152,28 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
     setLeaderboardPage(1);
   };
 
-  // Filter functions
+  // Updated filter functions
   const filterLeaderboard = (data: typeof mockLeaderboard) => {
     return data.filter(item => {
       if (leaderboardSearch && !item.user.toLowerCase().includes(leaderboardSearch.toLowerCase())) return false;
-      if (leaderboardFilters.tradesMin && item.trades < Number(leaderboardFilters.tradesMin)) return false;
-      if (leaderboardFilters.tradesMax && item.trades > Number(leaderboardFilters.tradesMax)) return false;
-      if (leaderboardFilters.successRateAllMin && item.successRateAll < Number(leaderboardFilters.successRateAllMin)) return false;
-      if (leaderboardFilters.successRateAllMax && item.successRateAll > Number(leaderboardFilters.successRateAllMax)) return false;
-      if (leaderboardFilters.avgAlphaAllMin && item.avgAlphaAll < Number(leaderboardFilters.avgAlphaAllMin)) return false;
-      if (leaderboardFilters.avgAlphaAllMax && item.avgAlphaAll > Number(leaderboardFilters.avgAlphaAllMax)) return false;
-      if (leaderboardFilters.successRateClosedMin && item.successRateClosed < Number(leaderboardFilters.successRateClosedMin)) return false;
-      if (leaderboardFilters.successRateClosedMax && item.successRateClosed > Number(leaderboardFilters.successRateClosedMax)) return false;
-      if (leaderboardFilters.avgAlphaClosedMin && item.avgAlphaClosed < Number(leaderboardFilters.avgAlphaClosedMin)) return false;
-      if (leaderboardFilters.avgAlphaClosedMax && item.avgAlphaClosed > Number(leaderboardFilters.avgAlphaClosedMax)) return false;
+      if (!checkFilterCondition(item.trades, leaderboardFilters.trades)) return false;
+      if (!checkFilterCondition(item.successRateAll, leaderboardFilters.successRateAll)) return false;
+      if (!checkFilterCondition(item.avgAlphaAll, leaderboardFilters.avgAlphaAll)) return false;
+      if (!checkFilterCondition(item.successRateClosed, leaderboardFilters.successRateClosed)) return false;
+      if (!checkFilterCondition(item.avgAlphaClosed, leaderboardFilters.avgAlphaClosed)) return false;
       return true;
     });
   };
 
   const filterBestTrades = (data: typeof mockBestTrades) => {
     return data.filter(item => {
-      if (bestTradesSearch && !item.user.toLowerCase().includes(bestTradesSearch.toLowerCase())) return false;
-      if (bestTradesFilters.ticker && !item.ticker.toLowerCase().includes(bestTradesFilters.ticker.toLowerCase())) return false;
-      if (bestTradesFilters.entryDateFrom && new Date(item.entryDate) < new Date(bestTradesFilters.entryDateFrom)) return false;
-      if (bestTradesFilters.entryDateTo && new Date(item.entryDate) > new Date(bestTradesFilters.entryDateTo)) return false;
+      if (bestTradesSearch && 
+          !item.user.toLowerCase().includes(bestTradesSearch.toLowerCase()) && 
+          !item.ticker.toLowerCase().includes(bestTradesSearch.toLowerCase())) return false;
+      if (!checkDateFilterCondition(item.entryDate, bestTradesFilters.entryDate)) return false;
       if (bestTradesFilters.side && bestTradesFilters.side !== 'all' && item.side !== bestTradesFilters.side) return false;
-      if (bestTradesFilters.closeDate && new Date(item.closeDate) < new Date(bestTradesFilters.closeDate)) return false;
-      if (bestTradesFilters.closeDateTo && new Date(item.closeDate) > new Date(bestTradesFilters.closeDateTo)) return false;
-      if (bestTradesFilters.tickerReturnMin && item.tickerReturn < Number(bestTradesFilters.tickerReturnMin)) return false;
-      if (bestTradesFilters.tickerReturnMax && item.tickerReturn > Number(bestTradesFilters.tickerReturnMax)) return false;
-      if (bestTradesFilters.alphaMin && item.alpha < Number(bestTradesFilters.alphaMin)) return false;
-      if (bestTradesFilters.alphaMax && item.alpha > Number(bestTradesFilters.alphaMax)) return false;
-      if (bestTradesFilters.user && !item.user.toLowerCase().includes(bestTradesFilters.user.toLowerCase())) return false;
+      if (!checkDateFilterCondition(item.closeDate, bestTradesFilters.closeDate)) return false;
+      if (!checkFilterCondition(item.alpha, bestTradesFilters.alpha)) return false;
       return true;
     });
   };
@@ -250,6 +288,23 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
   const leaderboardTotalPages = Math.ceil(sortedLeaderboard.length / rowsPerPage);
   const bestTradesTotalPages = Math.ceil(sortedBestTrades.length / rowsPerPage);
 
+  // Filter handlers
+  const handleLeaderboardFilter = (filterKey: string, condition: string, value: string, value2?: string) => {
+    setLeaderboardFilters(prev => ({
+      ...prev,
+      [filterKey]: { condition, value, value2: value2 || '' }
+    }));
+    setLeaderboardPage(1);
+  };
+
+  const handleBestTradesFilter = (filterKey: string, condition: string, value: string, value2?: string) => {
+    setBestTradesFilters(prev => ({
+      ...prev,
+      [filterKey]: { condition, value, value2: value2 || '' }
+    }));
+    setBestTradesPage(1);
+  };
+
   const SortButton = ({ 
     label, 
     sortKey, 
@@ -301,84 +356,72 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {/* Search and Filters */}
-            <div className="flex flex-col space-y-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                <Input
-                  placeholder="Search by user..."
-                  value={leaderboardSearch}
-                  onChange={(e) => {
-                    setLeaderboardSearch(e.target.value);
-                    setLeaderboardPage(1);
-                  }}
-                  className="pl-10 text-sm"
-                />
-              </div>
-              
-              {/* Filter Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                <Input
-                  placeholder="Min Trades"
-                  value={leaderboardFilters.tradesMin}
-                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, tradesMin: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="Max Trades"
-                  value={leaderboardFilters.tradesMax}
-                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, tradesMax: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="Min Success Rate (All)"
-                  value={leaderboardFilters.successRateAllMin}
-                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, successRateAllMin: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="Max Success Rate (All)"
-                  value={leaderboardFilters.successRateAllMax}
-                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, successRateAllMax: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="Min Avg Alpha (All)"
-                  value={leaderboardFilters.avgAlphaAllMin}
-                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, avgAlphaAllMin: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="Max Avg Alpha (All)"
-                  value={leaderboardFilters.avgAlphaAllMax}
-                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, avgAlphaAllMax: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="Min Success Rate (Closed)"
-                  value={leaderboardFilters.successRateClosedMin}
-                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, successRateClosedMin: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="Max Success Rate (Closed)"
-                  value={leaderboardFilters.successRateClosedMax}
-                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, successRateClosedMax: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="Min Avg Alpha (Closed)"
-                  value={leaderboardFilters.avgAlphaClosedMin}
-                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, avgAlphaClosedMin: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="Max Avg Alpha (Closed)"
-                  value={leaderboardFilters.avgAlphaClosedMax}
-                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, avgAlphaClosedMax: e.target.value }))}
-                  className="text-xs"
-                />
-              </div>
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              <Input
+                placeholder="Search by user..."
+                value={leaderboardSearch}
+                onChange={(e) => {
+                  setLeaderboardSearch(e.target.value);
+                  setLeaderboardPage(1);
+                }}
+                className="pl-10 text-sm"
+              />
+            </div>
+            
+            {/* Advanced Filter Buttons */}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveFilterDialog('leaderboard-trades')}
+                className="text-xs"
+              >
+                <Filter size={14} className="mr-1" />
+                Trades
+                {leaderboardFilters.trades.condition && <span className="ml-1 text-orange-500">•</span>}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveFilterDialog('leaderboard-successRateAll')}
+                className="text-xs"
+              >
+                <Filter size={14} className="mr-1" />
+                Success Rate (All)
+                {leaderboardFilters.successRateAll.condition && <span className="ml-1 text-orange-500">•</span>}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveFilterDialog('leaderboard-avgAlphaAll')}
+                className="text-xs"
+              >
+                <Filter size={14} className="mr-1" />
+                Avg Alpha (All)
+                {leaderboardFilters.avgAlphaAll.condition && <span className="ml-1 text-orange-500">•</span>}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveFilterDialog('leaderboard-successRateClosed')}
+                className="text-xs"
+              >
+                <Filter size={14} className="mr-1" />
+                Success Rate (Closed)
+                {leaderboardFilters.successRateClosed.condition && <span className="ml-1 text-orange-500">•</span>}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveFilterDialog('leaderboard-avgAlphaClosed')}
+                className="text-xs"
+              >
+                <Filter size={14} className="mr-1" />
+                Avg Alpha (Closed)
+                {leaderboardFilters.avgAlphaClosed.condition && <span className="ml-1 text-orange-500">•</span>}
+              </Button>
             </div>
 
             <div className="rounded-md border">
@@ -515,98 +558,62 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
               </TabsList>
             </Tabs>
 
-            {/* Search and Filters */}
-            <div className="flex flex-col space-y-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                <Input
-                  placeholder="Search by user..."
-                  value={bestTradesSearch}
-                  onChange={(e) => {
-                    setBestTradesSearch(e.target.value);
-                    setBestTradesPage(1);
-                  }}
-                  className="pl-10 text-sm"
-                />
-              </div>
-              
-              {/* Filter Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                <Input
-                  placeholder="Ticker"
-                  value={bestTradesFilters.ticker}
-                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, ticker: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  type="date"
-                  placeholder="Entry Date From"
-                  value={bestTradesFilters.entryDateFrom}
-                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, entryDateFrom: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  type="date"
-                  placeholder="Entry Date To"
-                  value={bestTradesFilters.entryDateTo}
-                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, entryDateTo: e.target.value }))}
-                  className="text-xs"
-                />
-                <Select value={bestTradesFilters.side} onValueChange={(value) => setBestTradesFilters(prev => ({ ...prev, side: value }))}>
-                  <SelectTrigger className="text-xs">
-                    <SelectValue placeholder="Side" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="LONG">LONG</SelectItem>
-                    <SelectItem value="SHORT">SHORT</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Input
-                  type="date"
-                  placeholder="Close Date From"
-                  value={bestTradesFilters.closeDate}
-                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, closeDate: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  type="date"
-                  placeholder="Close Date To"
-                  value={bestTradesFilters.closeDateTo}
-                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, closeDateTo: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="Min Ticker Return (%)"
-                  value={bestTradesFilters.tickerReturnMin}
-                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, tickerReturnMin: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="Max Ticker Return (%)"
-                  value={bestTradesFilters.tickerReturnMax}
-                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, tickerReturnMax: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="Min Alpha (%)"
-                  value={bestTradesFilters.alphaMin}
-                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, alphaMin: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="Max Alpha (%)"
-                  value={bestTradesFilters.alphaMax}
-                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, alphaMax: e.target.value }))}
-                  className="text-xs"
-                />
-                <Input
-                  placeholder="User"
-                  value={bestTradesFilters.user}
-                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, user: e.target.value }))}
-                  className="text-xs"
-                />
-              </div>
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              <Input
+                placeholder="Search by ticker or user..."
+                value={bestTradesSearch}
+                onChange={(e) => {
+                  setBestTradesSearch(e.target.value);
+                  setBestTradesPage(1);
+                }}
+                className="pl-10 text-sm"
+              />
+            </div>
+            
+            {/* Advanced Filter Buttons */}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveFilterDialog('bestTrades-entryDate')}
+                className="text-xs"
+              >
+                <Filter size={14} className="mr-1" />
+                Entry Date
+                {bestTradesFilters.entryDate.condition && <span className="ml-1 text-orange-500">•</span>}
+              </Button>
+              <Select value={bestTradesFilters.side} onValueChange={(value) => setBestTradesFilters(prev => ({ ...prev, side: value }))}>
+                <SelectTrigger className="w-24 h-8 text-xs">
+                  <SelectValue placeholder="Side" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="LONG">LONG</SelectItem>
+                  <SelectItem value="SHORT">SHORT</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveFilterDialog('bestTrades-closeDate')}
+                className="text-xs"
+              >
+                <Filter size={14} className="mr-1" />
+                Close Date
+                {bestTradesFilters.closeDate.condition && <span className="ml-1 text-orange-500">•</span>}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveFilterDialog('bestTrades-alpha')}
+                className="text-xs"
+              >
+                <Filter size={14} className="mr-1" />
+                Alpha
+                {bestTradesFilters.alpha.condition && <span className="ml-1 text-orange-500">•</span>}
+              </Button>
             </div>
 
             <div className="rounded-md border">
@@ -766,6 +773,80 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Filter Dialogs */}
+      <FilterDialog
+        isOpen={activeFilterDialog === 'leaderboard-trades'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="TRADES"
+        onApply={(condition, value, value2) => handleLeaderboardFilter('trades', condition, value, value2)}
+        currentCondition={leaderboardFilters.trades.condition}
+        currentValue={leaderboardFilters.trades.value}
+        currentValue2={leaderboardFilters.trades.value2}
+      />
+      <FilterDialog
+        isOpen={activeFilterDialog === 'leaderboard-successRateAll'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="SUCCESS RATE (ALL)"
+        onApply={(condition, value, value2) => handleLeaderboardFilter('successRateAll', condition, value, value2)}
+        currentCondition={leaderboardFilters.successRateAll.condition}
+        currentValue={leaderboardFilters.successRateAll.value}
+        currentValue2={leaderboardFilters.successRateAll.value2}
+      />
+      <FilterDialog
+        isOpen={activeFilterDialog === 'leaderboard-avgAlphaAll'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="AVG ALPHA (ALL)"
+        onApply={(condition, value, value2) => handleLeaderboardFilter('avgAlphaAll', condition, value, value2)}
+        currentCondition={leaderboardFilters.avgAlphaAll.condition}
+        currentValue={leaderboardFilters.avgAlphaAll.value}
+        currentValue2={leaderboardFilters.avgAlphaAll.value2}
+      />
+      <FilterDialog
+        isOpen={activeFilterDialog === 'leaderboard-successRateClosed'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="SUCCESS RATE (CLOSED)"
+        onApply={(condition, value, value2) => handleLeaderboardFilter('successRateClosed', condition, value, value2)}
+        currentCondition={leaderboardFilters.successRateClosed.condition}
+        currentValue={leaderboardFilters.successRateClosed.value}
+        currentValue2={leaderboardFilters.successRateClosed.value2}
+      />
+      <FilterDialog
+        isOpen={activeFilterDialog === 'leaderboard-avgAlphaClosed'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="AVG ALPHA (CLOSED)"
+        onApply={(condition, value, value2) => handleLeaderboardFilter('avgAlphaClosed', condition, value, value2)}
+        currentCondition={leaderboardFilters.avgAlphaClosed.condition}
+        currentValue={leaderboardFilters.avgAlphaClosed.value}
+        currentValue2={leaderboardFilters.avgAlphaClosed.value2}
+      />
+      <FilterDialog
+        isOpen={activeFilterDialog === 'bestTrades-entryDate'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="ENTRY DATE"
+        onApply={(condition, value, value2) => handleBestTradesFilter('entryDate', condition, value, value2)}
+        currentCondition={bestTradesFilters.entryDate.condition}
+        currentValue={bestTradesFilters.entryDate.value}
+        currentValue2={bestTradesFilters.entryDate.value2}
+      />
+      <FilterDialog
+        isOpen={activeFilterDialog === 'bestTrades-closeDate'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="CLOSE DATE"
+        onApply={(condition, value, value2) => handleBestTradesFilter('closeDate', condition, value, value2)}
+        currentCondition={bestTradesFilters.closeDate.condition}
+        currentValue={bestTradesFilters.closeDate.value}
+        currentValue2={bestTradesFilters.closeDate.value2}
+      />
+      <FilterDialog
+        isOpen={activeFilterDialog === 'bestTrades-alpha'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="ALPHA"
+        onApply={(condition, value, value2) => handleBestTradesFilter('alpha', condition, value, value2)}
+        currentCondition={bestTradesFilters.alpha.condition}
+        currentValue={bestTradesFilters.alpha.value}
+        currentValue2={bestTradesFilters.alpha.value2}
+      />
     </div>
   );
 };
