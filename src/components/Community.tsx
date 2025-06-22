@@ -2,9 +2,12 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ChevronUp, ChevronDown, EyeOff } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { ChevronUp, ChevronDown, EyeOff, Search, Filter } from 'lucide-react';
 
 interface CommunityProps {
   isUserPrivate?: boolean;
@@ -22,73 +25,67 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
     direction: 'asc' | 'desc';
   }>({ key: 'avgAlphaAll', direction: 'desc' });
 
-  // Mock data for Best Trades
-  const mockBestTrades = [
-    {
-      ticker: 'AAPL',
-      entryDate: '2024-01-15',
-      side: 'LONG',
-      entryPrice: 185.64,
-      closeDate: '2024-02-20',
-      exitPrice: 195.12,
-      tickerReturn: 5.11,
-      sp500Return: 2.34,
-      alpha: 2.77,
-      user: 'TradeGuru'
-    },
-    {
-      ticker: 'TSLA',
-      entryDate: '2024-03-10',
-      side: 'SHORT',
-      entryPrice: 201.29,
-      closeDate: '2024-04-15',
-      exitPrice: 180.45,
-      tickerReturn: -10.35,
-      sp500Return: 1.85,
-      alpha: -12.20,
-      user: 'StockMaster'
-    },
-    {
-      ticker: 'NVDA',
-      entryDate: '2024-05-01',
-      side: 'LONG',
-      entryPrice: 875.28,
-      closeDate: '2024-06-10',
-      exitPrice: 920.15,
-      tickerReturn: 5.13,
-      sp500Return: 0.95,
-      alpha: 4.18,
-      user: 'InvestPro'
-    }
-  ];
+  // Pagination states
+  const [leaderboardPage, setLeaderboardPage] = useState(1);
+  const [bestTradesPage, setBestTradesPage] = useState(1);
+  const rowsPerPage = 20;
 
-  // Mock data for Leaderboard
-  const mockLeaderboard = [
-    {
-      user: 'TradeGuru',
-      trades: 42,
-      successRateAll: 78.5,
-      avgAlphaAll: 12.3,
-      successRateClosed: 82.1,
-      avgAlphaClosed: 15.7,
-    },
-    {
-      user: 'StockMaster',
-      trades: 38,
-      successRateAll: 72.3,
-      avgAlphaAll: 9.8,
-      successRateClosed: 75.6,
-      avgAlphaClosed: 11.2,
-    },
-    {
-      user: 'InvestPro',
-      trades: 55,
-      successRateAll: 68.9,
-      avgAlphaAll: 8.5,
-      successRateClosed: 71.4,
-      avgAlphaClosed: 10.1,
-    },
-  ];
+  // Search states
+  const [leaderboardSearch, setLeaderboardSearch] = useState('');
+  const [bestTradesSearch, setBestTradesSearch] = useState('');
+
+  // Filter states for Leaderboard
+  const [leaderboardFilters, setLeaderboardFilters] = useState({
+    tradesMin: '',
+    tradesMax: '',
+    successRateAllMin: '',
+    successRateAllMax: '',
+    avgAlphaAllMin: '',
+    avgAlphaAllMax: '',
+    successRateClosedMin: '',
+    successRateClosedMax: '',
+    avgAlphaClosedMin: '',
+    avgAlphaClosedMax: ''
+  });
+
+  // Filter states for Best Trades
+  const [bestTradesFilters, setBestTradesFilters] = useState({
+    ticker: '',
+    entryDateFrom: '',
+    entryDateTo: '',
+    side: '',
+    closeDate: '',
+    closeDateTo: '',
+    tickerReturnMin: '',
+    tickerReturnMax: '',
+    alphaMin: '',
+    alphaMax: '',
+    user: ''
+  });
+
+  // Mock data for Best Trades (expanded for pagination demo)
+  const mockBestTrades = Array.from({ length: 50 }, (_, i) => ({
+    ticker: ['AAPL', 'TSLA', 'NVDA', 'MSFT', 'GOOGL'][i % 5],
+    entryDate: new Date(2024, Math.floor(i / 10), (i % 10) + 1).toISOString().split('T')[0],
+    side: i % 2 === 0 ? 'LONG' : 'SHORT',
+    entryPrice: 150 + (i * 10),
+    closeDate: new Date(2024, Math.floor(i / 10) + 1, (i % 10) + 1).toISOString().split('T')[0],
+    exitPrice: 160 + (i * 10),
+    tickerReturn: -10 + (i % 20),
+    sp500Return: -5 + (i % 10),
+    alpha: -15 + (i % 30),
+    user: ['TradeGuru', 'StockMaster', 'InvestPro', 'MarketWiz', 'TradeLord'][i % 5]
+  }));
+
+  // Mock data for Leaderboard (expanded for pagination demo)
+  const mockLeaderboard = Array.from({ length: 45 }, (_, i) => ({
+    user: `Trader${i + 1}`,
+    trades: 20 + (i % 50),
+    successRateAll: 50 + (i % 40),
+    avgAlphaAll: -5 + (i % 25),
+    successRateClosed: 55 + (i % 35),
+    avgAlphaClosed: -3 + (i % 20),
+  }));
 
   const handleBestTradesSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'desc';
@@ -96,6 +93,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
       direction = 'asc';
     }
     setBestTradesSortConfig({ key, direction });
+    setBestTradesPage(1);
   };
 
   const handleLeaderboardSort = (key: string) => {
@@ -104,9 +102,88 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
       direction = 'asc';
     }
     setLeaderboardSortConfig({ key, direction });
+    setLeaderboardPage(1);
   };
 
-  const sortedBestTrades = [...mockBestTrades].sort((a, b) => {
+  // Filter functions
+  const filterLeaderboard = (data: typeof mockLeaderboard) => {
+    return data.filter(item => {
+      if (leaderboardSearch && !item.user.toLowerCase().includes(leaderboardSearch.toLowerCase())) return false;
+      if (leaderboardFilters.tradesMin && item.trades < Number(leaderboardFilters.tradesMin)) return false;
+      if (leaderboardFilters.tradesMax && item.trades > Number(leaderboardFilters.tradesMax)) return false;
+      if (leaderboardFilters.successRateAllMin && item.successRateAll < Number(leaderboardFilters.successRateAllMin)) return false;
+      if (leaderboardFilters.successRateAllMax && item.successRateAll > Number(leaderboardFilters.successRateAllMax)) return false;
+      if (leaderboardFilters.avgAlphaAllMin && item.avgAlphaAll < Number(leaderboardFilters.avgAlphaAllMin)) return false;
+      if (leaderboardFilters.avgAlphaAllMax && item.avgAlphaAll > Number(leaderboardFilters.avgAlphaAllMax)) return false;
+      if (leaderboardFilters.successRateClosedMin && item.successRateClosed < Number(leaderboardFilters.successRateClosedMin)) return false;
+      if (leaderboardFilters.successRateClosedMax && item.successRateClosed > Number(leaderboardFilters.successRateClosedMax)) return false;
+      if (leaderboardFilters.avgAlphaClosedMin && item.avgAlphaClosed < Number(leaderboardFilters.avgAlphaClosedMin)) return false;
+      if (leaderboardFilters.avgAlphaClosedMax && item.avgAlphaClosed > Number(leaderboardFilters.avgAlphaClosedMax)) return false;
+      return true;
+    });
+  };
+
+  const filterBestTrades = (data: typeof mockBestTrades) => {
+    return data.filter(item => {
+      if (bestTradesSearch && !item.user.toLowerCase().includes(bestTradesSearch.toLowerCase())) return false;
+      if (bestTradesFilters.ticker && !item.ticker.toLowerCase().includes(bestTradesFilters.ticker.toLowerCase())) return false;
+      if (bestTradesFilters.entryDateFrom && new Date(item.entryDate) < new Date(bestTradesFilters.entryDateFrom)) return false;
+      if (bestTradesFilters.entryDateTo && new Date(item.entryDate) > new Date(bestTradesFilters.entryDateTo)) return false;
+      if (bestTradesFilters.side && item.side !== bestTradesFilters.side) return false;
+      if (bestTradesFilters.closeDate && new Date(item.closeDate) < new Date(bestTradesFilters.closeDate)) return false;
+      if (bestTradesFilters.closeDateTo && new Date(item.closeDate) > new Date(bestTradesFilters.closeDateTo)) return false;
+      if (bestTradesFilters.tickerReturnMin && item.tickerReturn < Number(bestTradesFilters.tickerReturnMin)) return false;
+      if (bestTradesFilters.tickerReturnMax && item.tickerReturn > Number(bestTradesFilters.tickerReturnMax)) return false;
+      if (bestTradesFilters.alphaMin && item.alpha < Number(bestTradesFilters.alphaMin)) return false;
+      if (bestTradesFilters.alphaMax && item.alpha > Number(bestTradesFilters.alphaMax)) return false;
+      if (bestTradesFilters.user && !item.user.toLowerCase().includes(bestTradesFilters.user.toLowerCase())) return false;
+      return true;
+    });
+  };
+
+  // Apply filters and sorting
+  const filteredLeaderboard = filterLeaderboard(mockLeaderboard);
+  const filteredBestTrades = filterBestTrades(mockBestTrades);
+
+  const sortedLeaderboard = [...filteredLeaderboard].sort((a, b) => {
+    const { key, direction } = leaderboardSortConfig;
+    let aValue, bValue;
+    
+    switch (key) {
+      case 'user':
+        aValue = a.user;
+        bValue = b.user;
+        break;
+      case 'trades':
+        aValue = a.trades;
+        bValue = b.trades;
+        break;
+      case 'successRateAll':
+        aValue = a.successRateAll;
+        bValue = b.successRateAll;
+        break;
+      case 'avgAlphaAll':
+        aValue = a.avgAlphaAll;
+        bValue = b.avgAlphaAll;
+        break;
+      case 'successRateClosed':
+        aValue = a.successRateClosed;
+        bValue = b.successRateClosed;
+        break;
+      case 'avgAlphaClosed':
+        aValue = a.avgAlphaClosed;
+        bValue = b.avgAlphaClosed;
+        break;
+      default:
+        return 0;
+    }
+    
+    if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+    if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const sortedBestTrades = [...filteredBestTrades].sort((a, b) => {
     const { key, direction } = bestTradesSortConfig;
     let aValue, bValue;
     
@@ -160,43 +237,19 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
     return 0;
   });
 
-  const sortedLeaderboard = [...mockLeaderboard].sort((a, b) => {
-    const { key, direction } = leaderboardSortConfig;
-    let aValue, bValue;
-    
-    switch (key) {
-      case 'user':
-        aValue = a.user;
-        bValue = b.user;
-        break;
-      case 'trades':
-        aValue = a.trades;
-        bValue = b.trades;
-        break;
-      case 'successRateAll':
-        aValue = a.successRateAll;
-        bValue = b.successRateAll;
-        break;
-      case 'avgAlphaAll':
-        aValue = a.avgAlphaAll;
-        bValue = b.avgAlphaAll;
-        break;
-      case 'successRateClosed':
-        aValue = a.successRateClosed;
-        bValue = b.successRateClosed;
-        break;
-      case 'avgAlphaClosed':
-        aValue = a.avgAlphaClosed;
-        bValue = b.avgAlphaClosed;
-        break;
-      default:
-        return 0;
-    }
-    
-    if (aValue < bValue) return direction === 'asc' ? -1 : 1;
-    if (aValue > bValue) return direction === 'asc' ? 1 : -1;
-    return 0;
-  });
+  // Pagination logic
+  const paginatedLeaderboard = sortedLeaderboard.slice(
+    (leaderboardPage - 1) * rowsPerPage,
+    leaderboardPage * rowsPerPage
+  );
+
+  const paginatedBestTrades = sortedBestTrades.slice(
+    (bestTradesPage - 1) * rowsPerPage,
+    bestTradesPage * rowsPerPage
+  );
+
+  const leaderboardTotalPages = Math.ceil(sortedLeaderboard.length / rowsPerPage);
+  const bestTradesTotalPages = Math.ceil(sortedBestTrades.length / rowsPerPage);
 
   const SortButton = ({ 
     label, 
@@ -211,13 +264,13 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
   }) => (
     <button
       onClick={() => onSort(sortKey)}
-      className="flex items-center gap-1 hover:text-gray-900 font-medium"
+      className="flex items-center gap-1 hover:text-gray-900 font-medium text-xs"
     >
       {label}
       {currentSortConfig.key === sortKey && (
         currentSortConfig.direction === 'desc' ? 
-          <ChevronDown size={14} /> : 
-          <ChevronUp size={14} />
+          <ChevronDown size={12} /> : 
+          <ChevronUp size={12} />
       )}
     </button>
   );
@@ -238,7 +291,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Leaderboard Section - Now comes first */}
+      {/* Leaderboard Section */}
       <Card className="border-0 shadow-none bg-gray-50 relative">
         {isUserPrivate && <PrivacyOverlay />}
         <CardHeader>
@@ -248,86 +301,200 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
           </p>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-center">
-                    <SortButton 
-                      label="USER" 
-                      sortKey="user" 
-                      currentSortConfig={leaderboardSortConfig}
-                      onSort={handleLeaderboardSort}
-                    />
-                  </TableHead>
-                  <TableHead className="text-center">
-                    <SortButton 
-                      label="NUMBER OF TRADES" 
-                      sortKey="trades" 
-                      currentSortConfig={leaderboardSortConfig}
-                      onSort={handleLeaderboardSort}
-                    />
-                  </TableHead>
-                  <TableHead className="text-center">
-                    <SortButton 
-                      label="SUCCESS RATE (ALL)" 
-                      sortKey="successRateAll" 
-                      currentSortConfig={leaderboardSortConfig}
-                      onSort={handleLeaderboardSort}
-                    />
-                  </TableHead>
-                  <TableHead className="text-center">
-                    <SortButton 
-                      label="AVERAGE ALPHA (ALL)" 
-                      sortKey="avgAlphaAll" 
-                      currentSortConfig={leaderboardSortConfig}
-                      onSort={handleLeaderboardSort}
-                    />
-                  </TableHead>
-                  <TableHead className="text-center">
-                    <SortButton 
-                      label="SUCCESS RATE (CLOSED)" 
-                      sortKey="successRateClosed" 
-                      currentSortConfig={leaderboardSortConfig}
-                      onSort={handleLeaderboardSort}
-                    />
-                  </TableHead>
-                  <TableHead className="text-center">
-                    <SortButton 
-                      label="AVERAGE ALPHA (CLOSED)" 
-                      sortKey="avgAlphaClosed" 
-                      currentSortConfig={leaderboardSortConfig}
-                      onSort={handleLeaderboardSort}
-                    />
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sortedLeaderboard.map((trader, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="text-center font-semibold">{trader.user}</TableCell>
-                    <TableCell className="text-center">{trader.trades}</TableCell>
-                    <TableCell className="text-center">{trader.successRateAll.toFixed(1)}%</TableCell>
-                    <TableCell className={`text-center font-semibold ${
-                      trader.avgAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {trader.avgAlphaAll >= 0 ? '+' : ''}{trader.avgAlphaAll.toFixed(1)}%
-                    </TableCell>
-                    <TableCell className="text-center">{trader.successRateClosed.toFixed(1)}%</TableCell>
-                    <TableCell className={`text-center font-semibold ${
-                      trader.avgAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {trader.avgAlphaClosed >= 0 ? '+' : ''}{trader.avgAlphaClosed.toFixed(1)}%
-                    </TableCell>
+          <div className="space-y-4">
+            {/* Search and Filters */}
+            <div className="flex flex-col space-y-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                <Input
+                  placeholder="Search by user..."
+                  value={leaderboardSearch}
+                  onChange={(e) => {
+                    setLeaderboardSearch(e.target.value);
+                    setLeaderboardPage(1);
+                  }}
+                  className="pl-10 text-sm"
+                />
+              </div>
+              
+              {/* Filter Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                <Input
+                  placeholder="Min Trades"
+                  value={leaderboardFilters.tradesMin}
+                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, tradesMin: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="Max Trades"
+                  value={leaderboardFilters.tradesMax}
+                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, tradesMax: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="Min Success Rate (All)"
+                  value={leaderboardFilters.successRateAllMin}
+                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, successRateAllMin: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="Max Success Rate (All)"
+                  value={leaderboardFilters.successRateAllMax}
+                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, successRateAllMax: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="Min Avg Alpha (All)"
+                  value={leaderboardFilters.avgAlphaAllMin}
+                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, avgAlphaAllMin: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="Max Avg Alpha (All)"
+                  value={leaderboardFilters.avgAlphaAllMax}
+                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, avgAlphaAllMax: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="Min Success Rate (Closed)"
+                  value={leaderboardFilters.successRateClosedMin}
+                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, successRateClosedMin: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="Max Success Rate (Closed)"
+                  value={leaderboardFilters.successRateClosedMax}
+                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, successRateClosedMax: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="Min Avg Alpha (Closed)"
+                  value={leaderboardFilters.avgAlphaClosedMin}
+                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, avgAlphaClosedMin: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="Max Avg Alpha (Closed)"
+                  value={leaderboardFilters.avgAlphaClosedMax}
+                  onChange={(e) => setLeaderboardFilters(prev => ({ ...prev, avgAlphaClosedMax: e.target.value }))}
+                  className="text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-center px-2">
+                      <SortButton 
+                        label="USER" 
+                        sortKey="user" 
+                        currentSortConfig={leaderboardSortConfig}
+                        onSort={handleLeaderboardSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      <SortButton 
+                        label="TRADES" 
+                        sortKey="trades" 
+                        currentSortConfig={leaderboardSortConfig}
+                        onSort={handleLeaderboardSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      <SortButton 
+                        label="SUCCESS RATE (ALL)" 
+                        sortKey="successRateAll" 
+                        currentSortConfig={leaderboardSortConfig}
+                        onSort={handleLeaderboardSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      <SortButton 
+                        label="AVG ALPHA (ALL)" 
+                        sortKey="avgAlphaAll" 
+                        currentSortConfig={leaderboardSortConfig}
+                        onSort={handleLeaderboardSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      <SortButton 
+                        label="SUCCESS RATE (CLOSED)" 
+                        sortKey="successRateClosed" 
+                        currentSortConfig={leaderboardSortConfig}
+                        onSort={handleLeaderboardSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      <SortButton 
+                        label="AVG ALPHA (CLOSED)" 
+                        sortKey="avgAlphaClosed" 
+                        currentSortConfig={leaderboardSortConfig}
+                        onSort={handleLeaderboardSort}
+                      />
+                    </TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {paginatedLeaderboard.map((trader, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="text-center font-semibold px-2 py-2 text-xs">{trader.user}</TableCell>
+                      <TableCell className="text-center px-2 py-2 text-xs">{trader.trades}</TableCell>
+                      <TableCell className="text-center px-2 py-2 text-xs">{trader.successRateAll.toFixed(1)}%</TableCell>
+                      <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
+                        trader.avgAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {trader.avgAlphaAll >= 0 ? '+' : ''}{trader.avgAlphaAll.toFixed(1)}%
+                      </TableCell>
+                      <TableCell className="text-center px-2 py-2 text-xs">{trader.successRateClosed.toFixed(1)}%</TableCell>
+                      <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
+                        trader.avgAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {trader.avgAlphaClosed >= 0 ? '+' : ''}{trader.avgAlphaClosed.toFixed(1)}%
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Pagination */}
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setLeaderboardPage(Math.max(1, leaderboardPage - 1))}
+                    className={leaderboardPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                {Array.from({ length: Math.min(5, leaderboardTotalPages) }, (_, i) => {
+                  const pageNum = Math.max(1, Math.min(leaderboardTotalPages - 4, leaderboardPage - 2)) + i;
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        onClick={() => setLeaderboardPage(pageNum)}
+                        isActive={pageNum === leaderboardPage}
+                        className="cursor-pointer"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setLeaderboardPage(Math.min(leaderboardTotalPages, leaderboardPage + 1))}
+                    className={leaderboardPage === leaderboardTotalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         </CardContent>
       </Card>
 
-      {/* Best Trades Section - Now comes second */}
+      {/* Best Trades Section */}
       <Card className="border-0 shadow-none bg-gray-50 relative">
         {isUserPrivate && <PrivacyOverlay />}
         <CardHeader>
@@ -349,11 +516,105 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
               </TabsList>
             </Tabs>
 
+            {/* Search and Filters */}
+            <div className="flex flex-col space-y-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                <Input
+                  placeholder="Search by user..."
+                  value={bestTradesSearch}
+                  onChange={(e) => {
+                    setBestTradesSearch(e.target.value);
+                    setBestTradesPage(1);
+                  }}
+                  className="pl-10 text-sm"
+                />
+              </div>
+              
+              {/* Filter Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                <Input
+                  placeholder="Ticker"
+                  value={bestTradesFilters.ticker}
+                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, ticker: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  type="date"
+                  placeholder="Entry Date From"
+                  value={bestTradesFilters.entryDateFrom}
+                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, entryDateFrom: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  type="date"
+                  placeholder="Entry Date To"
+                  value={bestTradesFilters.entryDateTo}
+                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, entryDateTo: e.target.value }))}
+                  className="text-xs"
+                />
+                <Select value={bestTradesFilters.side} onValueChange={(value) => setBestTradesFilters(prev => ({ ...prev, side: value }))}>
+                  <SelectTrigger className="text-xs">
+                    <SelectValue placeholder="Side" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All</SelectItem>
+                    <SelectItem value="LONG">LONG</SelectItem>
+                    <SelectItem value="SHORT">SHORT</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  type="date"
+                  placeholder="Close Date From"
+                  value={bestTradesFilters.closeDate}
+                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, closeDate: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  type="date"
+                  placeholder="Close Date To"
+                  value={bestTradesFilters.closeDateTo}
+                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, closeDateTo: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="Min Ticker Return (%)"
+                  value={bestTradesFilters.tickerReturnMin}
+                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, tickerReturnMin: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="Max Ticker Return (%)"
+                  value={bestTradesFilters.tickerReturnMax}
+                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, tickerReturnMax: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="Min Alpha (%)"
+                  value={bestTradesFilters.alphaMin}
+                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, alphaMin: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="Max Alpha (%)"
+                  value={bestTradesFilters.alphaMax}
+                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, alphaMax: e.target.value }))}
+                  className="text-xs"
+                />
+                <Input
+                  placeholder="User"
+                  value={bestTradesFilters.user}
+                  onChange={(e) => setBestTradesFilters(prev => ({ ...prev, user: e.target.value }))}
+                  className="text-xs"
+                />
+              </div>
+            </div>
+
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-center">
+                    <TableHead className="text-center px-2">
                       <SortButton 
                         label="TICKER" 
                         sortKey="ticker" 
@@ -361,7 +622,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                         onSort={handleBestTradesSort}
                       />
                     </TableHead>
-                    <TableHead className="text-center">
+                    <TableHead className="text-center px-2">
                       <SortButton 
                         label="ENTRY DATE" 
                         sortKey="entryDate" 
@@ -369,15 +630,15 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                         onSort={handleBestTradesSort}
                       />
                     </TableHead>
-                    <TableHead className="text-center">
+                    <TableHead className="text-center px-2">
                       <SortButton 
-                        label="LONG/SHORT" 
+                        label="SIDE" 
                         sortKey="side" 
                         currentSortConfig={bestTradesSortConfig}
                         onSort={handleBestTradesSort}
                       />
                     </TableHead>
-                    <TableHead className="text-center">
+                    <TableHead className="text-center px-2">
                       <SortButton 
                         label="ENTRY PRICE" 
                         sortKey="entryPrice" 
@@ -385,7 +646,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                         onSort={handleBestTradesSort}
                       />
                     </TableHead>
-                    <TableHead className="text-center">
+                    <TableHead className="text-center px-2">
                       <SortButton 
                         label="CLOSE DATE" 
                         sortKey="closeDate" 
@@ -393,7 +654,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                         onSort={handleBestTradesSort}
                       />
                     </TableHead>
-                    <TableHead className="text-center">
+                    <TableHead className="text-center px-2">
                       <SortButton 
                         label="EXIT PRICE" 
                         sortKey="exitPrice" 
@@ -401,7 +662,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                         onSort={handleBestTradesSort}
                       />
                     </TableHead>
-                    <TableHead className="text-center">
+                    <TableHead className="text-center px-2">
                       <SortButton 
                         label="TICKER RETURN" 
                         sortKey="tickerReturn" 
@@ -409,7 +670,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                         onSort={handleBestTradesSort}
                       />
                     </TableHead>
-                    <TableHead className="text-center">
+                    <TableHead className="text-center px-2">
                       <SortButton 
                         label="S&P500 RETURN" 
                         sortKey="sp500Return" 
@@ -417,7 +678,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                         onSort={handleBestTradesSort}
                       />
                     </TableHead>
-                    <TableHead className="text-center">
+                    <TableHead className="text-center px-2">
                       <SortButton 
                         label="ALPHA" 
                         sortKey="alpha" 
@@ -425,7 +686,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                         onSort={handleBestTradesSort}
                       />
                     </TableHead>
-                    <TableHead className="text-center">
+                    <TableHead className="text-center px-2">
                       <SortButton 
                         label="USER" 
                         sortKey="user" 
@@ -436,41 +697,73 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedBestTrades.map((trade, index) => (
+                  {paginatedBestTrades.map((trade, index) => (
                     <TableRow key={index}>
-                      <TableCell className="text-center font-semibold">{trade.ticker}</TableCell>
-                      <TableCell className="text-center">{trade.entryDate}</TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center font-semibold px-2 py-2 text-xs">{trade.ticker}</TableCell>
+                      <TableCell className="text-center px-2 py-2 text-xs">{trade.entryDate}</TableCell>
+                      <TableCell className="text-center px-2 py-2 text-xs">
                         <span className={`px-2 py-1 rounded text-xs font-semibold ${
                           trade.side === 'LONG' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                         }`}>
                           {trade.side}
                         </span>
                       </TableCell>
-                      <TableCell className="text-center">${trade.entryPrice.toFixed(2)}</TableCell>
-                      <TableCell className="text-center">{trade.closeDate}</TableCell>
-                      <TableCell className="text-center">${trade.exitPrice.toFixed(2)}</TableCell>
-                      <TableCell className={`text-center font-semibold ${
+                      <TableCell className="text-center px-2 py-2 text-xs">${trade.entryPrice.toFixed(2)}</TableCell>
+                      <TableCell className="text-center px-2 py-2 text-xs">{trade.closeDate}</TableCell>
+                      <TableCell className="text-center px-2 py-2 text-xs">${trade.exitPrice.toFixed(2)}</TableCell>
+                      <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
                         trade.tickerReturn >= 0 ? 'text-green-600' : 'text-red-600'
                       }`}>
                         {trade.tickerReturn >= 0 ? '+' : ''}{trade.tickerReturn.toFixed(2)}%
                       </TableCell>
-                      <TableCell className={`text-center font-semibold ${
+                      <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
                         trade.sp500Return >= 0 ? 'text-green-600' : 'text-red-600'
                       }`}>
                         {trade.sp500Return >= 0 ? '+' : ''}{trade.sp500Return.toFixed(2)}%
                       </TableCell>
-                      <TableCell className={`text-center font-semibold ${
+                      <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
                         trade.alpha >= 0 ? 'text-green-600' : 'text-red-600'
                       }`}>
                         {trade.alpha >= 0 ? '+' : ''}{trade.alpha.toFixed(2)}%
                       </TableCell>
-                      <TableCell className="text-center">{trade.user}</TableCell>
+                      <TableCell className="text-center px-2 py-2 text-xs">{trade.user}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </div>
+
+            {/* Pagination */}
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setBestTradesPage(Math.max(1, bestTradesPage - 1))}
+                    className={bestTradesPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                {Array.from({ length: Math.min(5, bestTradesTotalPages) }, (_, i) => {
+                  const pageNum = Math.max(1, Math.min(bestTradesTotalPages - 4, bestTradesPage - 2)) + i;
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        onClick={() => setBestTradesPage(pageNum)}
+                        isActive={pageNum === bestTradesPage}
+                        className="cursor-pointer"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setBestTradesPage(Math.min(bestTradesTotalPages, bestTradesPage + 1))}
+                    className={bestTradesPage === bestTradesTotalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         </CardContent>
       </Card>
