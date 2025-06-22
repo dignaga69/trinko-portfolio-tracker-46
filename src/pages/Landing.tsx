@@ -54,7 +54,7 @@ const Landing = () => {
             Can You Beat It?
           </h2>
           
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <p className="text-base text-gray-600 leading-relaxed">
             Track Your Trades, Get Performance Insights, Compare Them To Others, And Much More At Trinko.Ai
           </p>
           
