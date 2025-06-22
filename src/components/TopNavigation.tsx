@@ -29,11 +29,11 @@ const TopNavigation = () => {
   };
 
   return (
-    <div className="w-full bg-white border-b border-gray-100 px-8 py-4">
+    <div className="w-full bg-card border-b border-border px-8 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Left side - TRINKO aligned with sidebar */}
         <div className="w-64 flex items-center">
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight">TRINKO</h1>
+          <h1 className="text-2xl font-black text-foreground tracking-tight">TRINKO</h1>
         </div>
         
         {/* Right side - User controls aligned with main content */}
@@ -48,7 +48,7 @@ const TopNavigation = () => {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-80">
-                    <div className="text-sm text-gray-500 text-center py-4">
+                    <div className="text-sm text-muted-foreground text-center py-4">
                       No notifications yet
                     </div>
                   </PopoverContent>
