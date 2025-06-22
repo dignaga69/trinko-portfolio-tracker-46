@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,7 +9,7 @@ import LogTradeWrapper from '@/components/LogTradeWrapper';
 import PerformanceWrapper from '@/components/PerformanceWrapper';
 import Community from '@/components/Community';
 import Footer from '@/components/Footer';
-import { FileText, BarChart3, Trophy } from 'lucide-react';
+import { FileText, BarChart3, Trophy, Folder } from 'lucide-react';
 import PortfolioManager from '@/components/PortfolioManager';
 
 interface Trade {
@@ -112,34 +113,14 @@ const Index = () => {
     }));
   };
 
-  const getSectionIcon = () => {
-    switch (activeSection) {
-      case 'portfolio':
-        return <FileText size={24} className="mr-2" />;
-      case 'log-trade':
-        return <FileText size={24} className="mr-2" />;
-      case 'performance':
-        return <BarChart3 size={24} className="mr-2" />;
-      case 'leaderboard':
-        return <Trophy size={24} className="mr-2" />;
-      default:
-        return null;
-    }
-  };
-
-  const getSectionTitle = () => {
-    switch (activeSection) {
-      case 'portfolio':
-        return 'Portfolio';
-      case 'log-trade':
-        return 'Log Trade';
-      case 'performance':
-        return 'Performance';
-      case 'leaderboard':
-        return 'Leaderboard';
-      default:
-        return '';
-    }
+  const getSectionConfig = () => {
+    const configs = {
+      portfolio: { icon: Folder, title: 'Portfolio' },
+      'log-trade': { icon: FileText, title: 'Log Trade' },
+      performance: { icon: BarChart3, title: 'Performance' },
+      leaderboard: { icon: Trophy, title: 'Leaderboard' },
+    };
+    return configs[activeSection as keyof typeof configs] || configs.portfolio;
   };
 
   const renderContent = () => {
@@ -199,6 +180,8 @@ const Index = () => {
     return null;
   }
 
+  const { icon: IconComponent, title } = getSectionConfig();
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <TopNavigation />
@@ -215,8 +198,8 @@ const Index = () => {
             <div className="max-w-4xl mt-16">
               {/* Section Header */}
               <div className="flex items-center mb-6">
-                {getSectionIcon()}
-                <h1 className="text-2xl font-bold">{getSectionTitle()}</h1>
+                <IconComponent size={24} className="mr-2" />
+                <h1 className="text-2xl font-bold">{title}</h1>
               </div>
               
               {renderContent()}
