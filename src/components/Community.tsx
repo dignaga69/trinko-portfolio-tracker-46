@@ -33,18 +33,34 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
     direction: 'asc' | 'desc';
   }>({ key: 'avgAlphaAll', direction: 'desc' });
 
+  const [portfolioLeaderboardSortConfig, setPortfolioLeaderboardSortConfig] = useState<{
+    key: string;
+    direction: 'asc' | 'desc';
+  }>({ key: 'avgAlphaAll', direction: 'desc' });
+
   // Pagination states
   const [leaderboardPage, setLeaderboardPage] = useState(1);
+  const [portfolioLeaderboardPage, setPortfolioLeaderboardPage] = useState(1);
   const [bestTradesPage, setBestTradesPage] = useState(1);
   const rowsPerPage = 20;
 
   // Search states
   const [leaderboardSearch, setLeaderboardSearch] = useState('');
+  const [portfolioLeaderboardSearch, setPortfolioLeaderboardSearch] = useState('');
   const [bestTradesSearch, setBestTradesSearch] = useState('');
 
   // Advanced filter states for Leaderboard
   const [leaderboardFilters, setLeaderboardFilters] = useState({
-    trades: { condition: '', value: '', value2: '' },
+    tradesTotal: { condition: '', value: '', value2: '' },
+    successRateAll: { condition: '', value: '', value2: '' },
+    avgAlphaAll: { condition: '', value: '', value2: '' },
+    successRateClosed: { condition: '', value: '', value2: '' },
+    avgAlphaClosed: { condition: '', value: '', value2: '' }
+  });
+
+  // Advanced filter states for Portfolio Leaderboard
+  const [portfolioLeaderboardFilters, setPortfolioLeaderboardFilters] = useState({
+    tradesPortfolio: { condition: '', value: '', value2: '' },
     successRateAll: { condition: '', value: '', value2: '' },
     avgAlphaAll: { condition: '', value: '', value2: '' },
     successRateClosed: { condition: '', value: '', value2: '' },
@@ -79,11 +95,22 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
   // Mock data for Leaderboard (expanded for pagination demo)
   const mockLeaderboard = Array.from({ length: 45 }, (_, i) => ({
     user: `Trader${i + 1}`,
-    trades: 20 + (i % 50),
+    tradesTotal: 20 + (i % 50),
     successRateAll: 50 + (i % 40),
     avgAlphaAll: -5 + (i % 25),
     successRateClosed: 55 + (i % 35),
     avgAlphaClosed: -3 + (i % 20),
+  }));
+
+  // Mock data for Portfolio Leaderboard
+  const mockPortfolioLeaderboard = Array.from({ length: 40 }, (_, i) => ({
+    portfolio: ['Tech Growth', 'Value Plays', 'Momentum', 'Blue Chips', 'Small Caps'][i % 5],
+    user: `Trader${Math.floor(i / 5) + 1}`,
+    tradesPortfolio: 5 + (i % 20),
+    successRateAll: 45 + (i % 50),
+    avgAlphaAll: -8 + (i % 30),
+    successRateClosed: 50 + (i % 40),
+    avgAlphaClosed: -5 + (i % 25),
   }));
 
   // Filter helper function
@@ -154,15 +181,38 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
     setLeaderboardPage(1);
   };
 
+  const handlePortfolioLeaderboardSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'desc';
+    if (portfolioLeaderboardSortConfig.key === key && portfolioLeaderboardSortConfig.direction === 'desc') {
+      direction = 'asc';
+    }
+    setPortfolioLeaderboardSortConfig({ key, direction });
+    setPortfolioLeaderboardPage(1);
+  };
+
   // Updated filter functions
   const filterLeaderboard = (data: typeof mockLeaderboard) => {
     return data.filter(item => {
       if (leaderboardSearch && !item.user.toLowerCase().includes(leaderboardSearch.toLowerCase())) return false;
-      if (!checkFilterCondition(item.trades, leaderboardFilters.trades)) return false;
+      if (!checkFilterCondition(item.tradesTotal, leaderboardFilters.tradesTotal)) return false;
       if (!checkFilterCondition(item.successRateAll, leaderboardFilters.successRateAll)) return false;
       if (!checkFilterCondition(item.avgAlphaAll, leaderboardFilters.avgAlphaAll)) return false;
       if (!checkFilterCondition(item.successRateClosed, leaderboardFilters.successRateClosed)) return false;
       if (!checkFilterCondition(item.avgAlphaClosed, leaderboardFilters.avgAlphaClosed)) return false;
+      return true;
+    });
+  };
+
+  const filterPortfolioLeaderboard = (data: typeof mockPortfolioLeaderboard) => {
+    return data.filter(item => {
+      if (portfolioLeaderboardSearch && 
+          !item.portfolio.toLowerCase().includes(portfolioLeaderboardSearch.toLowerCase()) &&
+          !item.user.toLowerCase().includes(portfolioLeaderboardSearch.toLowerCase())) return false;
+      if (!checkFilterCondition(item.tradesPortfolio, portfolioLeaderboardFilters.tradesPortfolio)) return false;
+      if (!checkFilterCondition(item.successRateAll, portfolioLeaderboardFilters.successRateAll)) return false;
+      if (!checkFilterCondition(item.avgAlphaAll, portfolioLeaderboardFilters.avgAlphaAll)) return false;
+      if (!checkFilterCondition(item.successRateClosed, portfolioLeaderboardFilters.successRateClosed)) return false;
+      if (!checkFilterCondition(item.avgAlphaClosed, portfolioLeaderboardFilters.avgAlphaClosed)) return false;
       return true;
     });
   };
@@ -182,6 +232,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
 
   // Apply filters and sorting
   const filteredLeaderboard = filterLeaderboard(mockLeaderboard);
+  const filteredPortfolioLeaderboard = filterPortfolioLeaderboard(mockPortfolioLeaderboard);
   const filteredBestTrades = filterBestTrades(mockBestTrades);
 
   const sortedLeaderboard = [...filteredLeaderboard].sort((a, b) => {
@@ -193,9 +244,51 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
         aValue = a.user;
         bValue = b.user;
         break;
-      case 'trades':
-        aValue = a.trades;
-        bValue = b.trades;
+      case 'tradesTotal':
+        aValue = a.tradesTotal;
+        bValue = b.tradesTotal;
+        break;
+      case 'successRateAll':
+        aValue = a.successRateAll;
+        bValue = b.successRateAll;
+        break;
+      case 'avgAlphaAll':
+        aValue = a.avgAlphaAll;
+        bValue = b.avgAlphaAll;
+        break;
+      case 'successRateClosed':
+        aValue = a.successRateClosed;
+        bValue = b.successRateClosed;
+        break;
+      case 'avgAlphaClosed':
+        aValue = a.avgAlphaClosed;
+        bValue = b.avgAlphaClosed;
+        break;
+      default:
+        return 0;
+    }
+    
+    if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+    if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const sortedPortfolioLeaderboard = [...filteredPortfolioLeaderboard].sort((a, b) => {
+    const { key, direction } = portfolioLeaderboardSortConfig;
+    let aValue, bValue;
+    
+    switch (key) {
+      case 'portfolio':
+        aValue = a.portfolio;
+        bValue = b.portfolio;
+        break;
+      case 'user':
+        aValue = a.user;
+        bValue = b.user;
+        break;
+      case 'tradesPortfolio':
+        aValue = a.tradesPortfolio;
+        bValue = b.tradesPortfolio;
         break;
       case 'successRateAll':
         aValue = a.successRateAll;
@@ -282,12 +375,18 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
     leaderboardPage * rowsPerPage
   );
 
+  const paginatedPortfolioLeaderboard = sortedPortfolioLeaderboard.slice(
+    (portfolioLeaderboardPage - 1) * rowsPerPage,
+    portfolioLeaderboardPage * rowsPerPage
+  );
+
   const paginatedBestTrades = sortedBestTrades.slice(
     (bestTradesPage - 1) * rowsPerPage,
     bestTradesPage * rowsPerPage
   );
 
   const leaderboardTotalPages = Math.ceil(sortedLeaderboard.length / rowsPerPage);
+  const portfolioLeaderboardTotalPages = Math.ceil(sortedPortfolioLeaderboard.length / rowsPerPage);
   const bestTradesTotalPages = Math.ceil(sortedBestTrades.length / rowsPerPage);
 
   // Filter handlers
@@ -297,6 +396,15 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
       [filterKey]: { condition, value, value2: value2 || '' }
     }));
     setLeaderboardPage(1);
+    setActiveFilterDialog(null);
+  };
+
+  const handlePortfolioLeaderboardFilter = (filterKey: string, condition: string, value: string, value2?: string) => {
+    setPortfolioLeaderboardFilters(prev => ({
+      ...prev,
+      [filterKey]: { condition, value, value2: value2 || '' }
+    }));
+    setPortfolioLeaderboardPage(1);
     setActiveFilterDialog(null);
   };
 
@@ -340,24 +448,35 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
           onApply={(condition, value, value2) => {
             if (filterKey.startsWith('leaderboard-')) {
               handleLeaderboardFilter(filterKey.replace('leaderboard-', ''), condition, value, value2);
+            } else if (filterKey.startsWith('portfolioLeaderboard-')) {
+              handlePortfolioLeaderboardFilter(filterKey.replace('portfolioLeaderboard-', ''), condition, value, value2);
             } else {
               handleBestTradesFilter(filterKey.replace('bestTrades-', ''), condition, value, value2);
             }
           }}
-          currentCondition={filterKey.startsWith('leaderboard-') ? 
-            leaderboardFilters[filterKey.replace('leaderboard-', '') as keyof typeof leaderboardFilters]?.condition :
-            (filterKey.replace('bestTrades-', '') === 'side' ? '' : 
-             (bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters] as any)?.condition)
+          currentCondition={
+            filterKey.startsWith('leaderboard-') ? 
+              leaderboardFilters[filterKey.replace('leaderboard-', '') as keyof typeof leaderboardFilters]?.condition :
+            filterKey.startsWith('portfolioLeaderboard-') ?
+              portfolioLeaderboardFilters[filterKey.replace('portfolioLeaderboard-', '') as keyof typeof portfolioLeaderboardFilters]?.condition :
+              (filterKey.replace('bestTrades-', '') === 'side' ? '' : 
+               (bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters] as any)?.condition)
           }
-          currentValue={filterKey.startsWith('leaderboard-') ? 
-            leaderboardFilters[filterKey.replace('leaderboard-', '') as keyof typeof leaderboardFilters]?.value :
-            (filterKey.replace('bestTrades-', '') === 'side' ? '' : 
-             (bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters] as any)?.value)
+          currentValue={
+            filterKey.startsWith('leaderboard-') ? 
+              leaderboardFilters[filterKey.replace('leaderboard-', '') as keyof typeof leaderboardFilters]?.value :
+            filterKey.startsWith('portfolioLeaderboard-') ?
+              portfolioLeaderboardFilters[filterKey.replace('portfolioLeaderboard-', '') as keyof typeof portfolioLeaderboardFilters]?.value :
+              (filterKey.replace('bestTrades-', '') === 'side' ? '' : 
+               (bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters] as any)?.value)
           }
-          currentValue2={filterKey.startsWith('leaderboard-') ? 
-            leaderboardFilters[filterKey.replace('leaderboard-', '') as keyof typeof leaderboardFilters]?.value2 :
-            (filterKey.replace('bestTrades-', '') === 'side' ? '' : 
-             (bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters] as any)?.value2)
+          currentValue2={
+            filterKey.startsWith('leaderboard-') ? 
+              leaderboardFilters[filterKey.replace('leaderboard-', '') as keyof typeof leaderboardFilters]?.value2 :
+            filterKey.startsWith('portfolioLeaderboard-') ?
+              portfolioLeaderboardFilters[filterKey.replace('portfolioLeaderboard-', '') as keyof typeof portfolioLeaderboardFilters]?.value2 :
+              (filterKey.replace('bestTrades-', '') === 'side' ? '' : 
+               (bestTradesFilters[filterKey.replace('bestTrades-', '') as keyof typeof bestTradesFilters] as any)?.value2)
           }
           isDateFilter={isDateFilter}
         />
@@ -409,9 +528,9 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
             {/* Advanced Filter Buttons - Updated order */}
             <div className="flex flex-wrap gap-2">
               <FilterButton
-                label="Trades"
-                filterKey="leaderboard-trades"
-                hasActiveFilter={!!leaderboardFilters.trades.condition}
+                label="Trades (Total)"
+                filterKey="leaderboard-tradesTotal"
+                hasActiveFilter={!!leaderboardFilters.tradesTotal.condition}
               />
               <FilterButton
                 label="Success Rate (All)"
@@ -449,8 +568,8 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                     </TableHead>
                     <TableHead className="text-center px-2">
                       <SortButton 
-                        label="TRADES" 
-                        sortKey="trades" 
+                        label="TRADES (TOTAL)" 
+                        sortKey="tradesTotal" 
                         currentSortConfig={leaderboardSortConfig}
                         onSort={handleLeaderboardSort}
                       />
@@ -493,7 +612,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                   {paginatedLeaderboard.map((trader, index) => (
                     <TableRow key={index}>
                       <TableCell className="text-center font-semibold px-2 py-2 text-xs">{trader.user}</TableCell>
-                      <TableCell className="text-center px-2 py-2 text-xs">{trader.trades}</TableCell>
+                      <TableCell className="text-center px-2 py-2 text-xs">{trader.tradesTotal}</TableCell>
                       <TableCell className="text-center px-2 py-2 text-xs">{trader.successRateAll.toFixed(1)}%</TableCell>
                       <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
                         trader.avgAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'
@@ -539,6 +658,181 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                   <PaginationNext 
                     onClick={() => setLeaderboardPage(Math.min(leaderboardTotalPages, leaderboardPage + 1))}
                     className={leaderboardPage === leaderboardTotalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Portfolio Leaderboard Section */}
+      <Card className="border-0 shadow-none bg-gray-50 relative">
+        {isUserPrivate && <PrivacyOverlay />}
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Top Portfolios</CardTitle>
+          <p className="text-sm italic text-gray-600 mt-2">
+            The best performing portfolios.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              <Input
+                placeholder="Search by portfolio or user..."
+                value={portfolioLeaderboardSearch}
+                onChange={(e) => {
+                  setPortfolioLeaderboardSearch(e.target.value);
+                  setPortfolioLeaderboardPage(1);
+                }}
+                className="pl-10 text-sm"
+              />
+            </div>
+            
+            {/* Advanced Filter Buttons */}
+            <div className="flex flex-wrap gap-2">
+              <FilterButton
+                label="Trades (Portfolio)"
+                filterKey="portfolioLeaderboard-tradesPortfolio"
+                hasActiveFilter={!!portfolioLeaderboardFilters.tradesPortfolio.condition}
+              />
+              <FilterButton
+                label="Success Rate (All)"
+                filterKey="portfolioLeaderboard-successRateAll"
+                hasActiveFilter={!!portfolioLeaderboardFilters.successRateAll.condition}
+              />
+              <FilterButton
+                label="Avg Alpha (All)"
+                filterKey="portfolioLeaderboard-avgAlphaAll"
+                hasActiveFilter={!!portfolioLeaderboardFilters.avgAlphaAll.condition}
+              />
+              <FilterButton
+                label="Success Rate (Closed)"
+                filterKey="portfolioLeaderboard-successRateClosed"
+                hasActiveFilter={!!portfolioLeaderboardFilters.successRateClosed.condition}
+              />
+              <FilterButton
+                label="Avg Alpha (Closed)"
+                filterKey="portfolioLeaderboard-avgAlphaClosed"
+                hasActiveFilter={!!portfolioLeaderboardFilters.avgAlphaClosed.condition}
+              />
+            </div>
+
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-center px-2">
+                      <SortButton 
+                        label="PORTFOLIO" 
+                        sortKey="portfolio" 
+                        currentSortConfig={portfolioLeaderboardSortConfig}
+                        onSort={handlePortfolioLeaderboardSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      <SortButton 
+                        label="USER" 
+                        sortKey="user" 
+                        currentSortConfig={portfolioLeaderboardSortConfig}
+                        onSort={handlePortfolioLeaderboardSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      <SortButton 
+                        label="TRADES (PORTFOLIO)" 
+                        sortKey="tradesPortfolio" 
+                        currentSortConfig={portfolioLeaderboardSortConfig}
+                        onSort={handlePortfolioLeaderboardSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      <SortButton 
+                        label="SUCCESS RATE (ALL)" 
+                        sortKey="successRateAll" 
+                        currentSortConfig={portfolioLeaderboardSortConfig}
+                        onSort={handlePortfolioLeaderboardSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      <SortButton 
+                        label="AVG ALPHA (ALL)" 
+                        sortKey="avgAlphaAll" 
+                        currentSortConfig={portfolioLeaderboardSortConfig}
+                        onSort={handlePortfolioLeaderboardSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      <SortButton 
+                        label="SUCCESS RATE (CLOSED)" 
+                        sortKey="successRateClosed" 
+                        currentSortConfig={portfolioLeaderboardSortConfig}
+                        onSort={handlePortfolioLeaderboardSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      <SortButton 
+                        label="AVG ALPHA (CLOSED)" 
+                        sortKey="avgAlphaClosed" 
+                        currentSortConfig={portfolioLeaderboardSortConfig}
+                        onSort={handlePortfolioLeaderboardSort}
+                      />
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedPortfolioLeaderboard.map((portfolio, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="text-center font-semibold px-2 py-2 text-xs">{portfolio.portfolio}</TableCell>
+                      <TableCell className="text-center px-2 py-2 text-xs">{portfolio.user}</TableCell>
+                      <TableCell className="text-center px-2 py-2 text-xs">{portfolio.tradesPortfolio}</TableCell>
+                      <TableCell className="text-center px-2 py-2 text-xs">{portfolio.successRateAll.toFixed(1)}%</TableCell>
+                      <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
+                        portfolio.avgAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {portfolio.avgAlphaAll >= 0 ? '+' : ''}{portfolio.avgAlphaAll.toFixed(1)}%
+                      </TableCell>
+                      <TableCell className="text-center px-2 py-2 text-xs">{portfolio.successRateClosed.toFixed(1)}%</TableCell>
+                      <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
+                        portfolio.avgAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {portfolio.avgAlphaClosed >= 0 ? '+' : ''}{portfolio.avgAlphaClosed.toFixed(1)}%
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Pagination */}
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setPortfolioLeaderboardPage(Math.max(1, portfolioLeaderboardPage - 1))}
+                    className={portfolioLeaderboardPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                {Array.from({ length: Math.min(5, portfolioLeaderboardTotalPages) }, (_, i) => {
+                  const pageNum = Math.max(1, Math.min(portfolioLeaderboardTotalPages - 4, portfolioLeaderboardPage - 2)) + i;
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        onClick={() => setPortfolioLeaderboardPage(pageNum)}
+                        isActive={pageNum === portfolioLeaderboardPage}
+                        className="cursor-pointer"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setPortfolioLeaderboardPage(Math.min(portfolioLeaderboardTotalPages, portfolioLeaderboardPage + 1))}
+                    className={portfolioLeaderboardPage === portfolioLeaderboardTotalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                   />
                 </PaginationItem>
               </PaginationContent>
@@ -774,13 +1068,13 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
 
       {/* Filter Dialogs */}
       <FilterDialog
-        isOpen={activeFilterDialog === 'leaderboard-trades'}
+        isOpen={activeFilterDialog === 'leaderboard-tradesTotal'}
         onClose={() => setActiveFilterDialog(null)}
-        title="TRADES"
-        onApply={(condition, value, value2) => handleLeaderboardFilter('trades', condition, value, value2)}
-        currentCondition={leaderboardFilters.trades.condition}
-        currentValue={leaderboardFilters.trades.value}
-        currentValue2={leaderboardFilters.trades.value2}
+        title="TRADES (TOTAL)"
+        onApply={(condition, value, value2) => handleLeaderboardFilter('tradesTotal', condition, value, value2)}
+        currentCondition={leaderboardFilters.tradesTotal.condition}
+        currentValue={leaderboardFilters.tradesTotal.value}
+        currentValue2={leaderboardFilters.tradesTotal.value2}
       />
       <FilterDialog
         isOpen={activeFilterDialog === 'leaderboard-successRateAll'}
@@ -817,6 +1111,51 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
         currentCondition={leaderboardFilters.avgAlphaClosed.condition}
         currentValue={leaderboardFilters.avgAlphaClosed.value}
         currentValue2={leaderboardFilters.avgAlphaClosed.value2}
+      />
+      <FilterDialog
+        isOpen={activeFilterDialog === 'portfolioLeaderboard-tradesPortfolio'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="TRADES (PORTFOLIO)"
+        onApply={(condition, value, value2) => handlePortfolioLeaderboardFilter('tradesPortfolio', condition, value, value2)}
+        currentCondition={portfolioLeaderboardFilters.tradesPortfolio.condition}
+        currentValue={portfolioLeaderboardFilters.tradesPortfolio.value}
+        currentValue2={portfolioLeaderboardFilters.tradesPortfolio.value2}
+      />
+      <FilterDialog
+        isOpen={activeFilterDialog === 'portfolioLeaderboard-successRateAll'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="SUCCESS RATE (ALL)"
+        onApply={(condition, value, value2) => handlePortfolioLeaderboardFilter('successRateAll', condition, value, value2)}
+        currentCondition={portfolioLeaderboardFilters.successRateAll.condition}
+        currentValue={portfolioLeaderboardFilters.successRateAll.value}
+        currentValue2={portfolioLeaderboardFilters.successRateAll.value2}
+      />
+      <FilterDialog
+        isOpen={activeFilterDialog === 'portfolioLeaderboard-avgAlphaAll'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="AVG ALPHA (ALL)"
+        onApply={(condition, value, value2) => handlePortfolioLeaderboardFilter('avgAlphaAll', condition, value, value2)}
+        currentCondition={portfolioLeaderboardFilters.avgAlphaAll.condition}
+        currentValue={portfolioLeaderboardFilters.avgAlphaAll.value}
+        currentValue2={portfolioLeaderboardFilters.avgAlphaAll.value2}
+      />
+      <FilterDialog
+        isOpen={activeFilterDialog === 'portfolioLeaderboard-successRateClosed'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="SUCCESS RATE (CLOSED)"
+        onApply={(condition, value, value2) => handlePortfolioLeaderboardFilter('successRateClosed', condition, value, value2)}
+        currentCondition={portfolioLeaderboardFilters.successRateClosed.condition}
+        currentValue={portfolioLeaderboardFilters.successRateClosed.value}
+        currentValue2={portfolioLeaderboardFilters.successRateClosed.value2}
+      />
+      <FilterDialog
+        isOpen={activeFilterDialog === 'portfolioLeaderboard-avgAlphaClosed'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="AVG ALPHA (CLOSED)"
+        onApply={(condition, value, value2) => handlePortfolioLeaderboardFilter('avgAlphaClosed', condition, value, value2)}
+        currentCondition={portfolioLeaderboardFilters.avgAlphaClosed.condition}
+        currentValue={portfolioLeaderboardFilters.avgAlphaClosed.value}
+        currentValue2={portfolioLeaderboardFilters.avgAlphaClosed.value2}
       />
       <FilterDialog
         isOpen={activeFilterDialog === 'bestTrades-entryDate'}
