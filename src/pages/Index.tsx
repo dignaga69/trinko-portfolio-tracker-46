@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,6 +10,7 @@ import Community from '@/components/Community';
 import Footer from '@/components/Footer';
 import { FileText, BarChart3, Trophy, Folder } from 'lucide-react';
 import PortfolioManager from '@/components/PortfolioManager';
+import yahooFinance from 'yahoo-finance2';
 
 interface Trade {
   id: string;
@@ -96,21 +96,43 @@ const Index = () => {
     setTrades(prev => [...prev, trade]);
   };
 
-  const handleCloseTrade = (tradeId: string, closeReason: string) => {
-    setTrades(prev => prev.map(trade => {
-      if (trade.id === tradeId) {
-        // Simulate fetching current price for exit
-        const exitPrice = Math.random() * 200 + 50;
-        return {
-          ...trade,
-          status: 'closed' as const,
-          exitPrice,
-          exitDate: new Date(),
-          closeReason
-        };
-      }
-      return trade;
-    }));
+  const handleCloseTrade = async (tradeId: string, closeReason: string) => {
+    const trade = trades.find(t => t.id === tradeId);
+    if (!trade) return;
+
+    try {
+      // Fetch real-time price for the trade's ticker
+      const quote = await yahooFinance.quote(trade.ticker);
+      const exitPrice = quote?.regularMarketPrice || trade.entryPrice; // Fallback to entry price if quote fails
+
+      setTrades(prev => prev.map(t => {
+        if (t.id === tradeId) {
+          return {
+            ...t,
+            status: 'closed' as const,
+            exitPrice,
+            exitDate: new Date(),
+            closeReason
+          };
+        }
+        return t;
+      }));
+    } catch (error) {
+      console.error('Error fetching exit price:', error);
+      // Fallback to entry price if Yahoo Finance call fails
+      setTrades(prev => prev.map(t => {
+        if (t.id === tradeId) {
+          return {
+            ...t,
+            status: 'closed' as const,
+            exitPrice: t.entryPrice,
+            exitDate: new Date(),
+            closeReason
+          };
+        }
+        return t;
+      }));
+    }
   };
 
   const getSectionConfig = () => {

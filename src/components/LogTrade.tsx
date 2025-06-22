@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import yahooFinance from 'yahoo-finance2';
 
 interface Trade {
   id: string;
@@ -39,20 +40,34 @@ const LogTrade = ({ trades, portfolios, onAddTrade, onCloseTrade }: LogTradeProp
   const [selectedPortfolioId, setSelectedPortfolioId] = useState('');
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [priceError, setPriceError] = useState<string | null>(null);
 
   const openTrades = trades.filter(trade => trade.status === 'open');
 
   const fetchPrice = async (symbol: string) => {
     setIsLoading(true);
-    // Simulate API call - in real implementation, you'd connect to a financial data API
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const mockPrice = Math.random() * 200 + 50; // Random price between 50-250
-    setCurrentPrice(mockPrice);
-    setIsLoading(false);
+    setPriceError(null);
+    
+    try {
+      const quote = await yahooFinance.quote(symbol);
+      if (quote && quote.regularMarketPrice) {
+        setCurrentPrice(quote.regularMarketPrice);
+      } else {
+        setPriceError('Price not available for this symbol');
+        setCurrentPrice(null);
+      }
+    } catch (error) {
+      console.error('Error fetching price:', error);
+      setPriceError('Failed to fetch price. Please check the ticker symbol.');
+      setCurrentPrice(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleTickerChange = (value: string) => {
     setTicker(value);
+    setPriceError(null);
     if (value.length > 0) {
       fetchPrice(value);
     } else {
@@ -177,7 +192,10 @@ const LogTrade = ({ trades, portfolios, onAddTrade, onCloseTrade }: LogTradeProp
                     className="text-sm"
                   />
                   {isLoading && (
-                    <p className="text-xs text-gray-500">Fetching price...</p>
+                    <p className="text-xs text-gray-500">Fetching real-time price...</p>
+                  )}
+                  {priceError && (
+                    <p className="text-xs text-red-600">{priceError}</p>
                   )}
                   {currentPrice && (
                     <p className="text-xs text-green-600 font-medium">
