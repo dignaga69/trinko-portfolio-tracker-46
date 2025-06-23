@@ -20,7 +20,7 @@ const PrivacyToggle = ({ isPrivate, onToggle }: PrivacyToggleProps) => {
             <p className="text-sm text-gray-600">
               {isPrivate 
                 ? "Your performance is private. Others cannot view your stats, but you also cannot view the leaderboard."
-                : "Your performance is public. Others can view your stats on the leaderboard."
+                : "Your performance is public. Others can view your stats, and you can view the leaderboard."
               }
             </p>
           </div>
