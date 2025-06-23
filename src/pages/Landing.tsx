@@ -76,50 +76,75 @@ const Landing = () => {
       </div>
 
       {/* Features Section */}
-      <div className="max-w-6xl mx-auto px-8 py-16">
-        <div className="grid md:grid-cols-3 gap-12">
-          {/* Survival Mode Trading */}
-          <div className="text-center space-y-4">
-            <h3 className="text-xl font-bold text-gray-900">
+      <div className="max-w-7xl mx-auto px-8 py-32 space-y-32">
+        {/* Survival Mode Trading */}
+        <div className="flex items-center gap-16 even:flex-row-reverse">
+          <div className="flex-1">
+            <img 
+              src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=600&h=400&fit=crop&crop=center"
+              alt="Trading analytics on laptop"
+              className="w-full h-96 object-cover rounded-lg shadow-lg"
+            />
+          </div>
+          <div className="flex-1 space-y-6">
+            <h3 className="text-4xl font-bold text-gray-900">
               Survival Mode Trading: No Cheating, Just Results
             </h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
+            <p className="text-lg text-gray-600 leading-relaxed">
               Can you outperform the market? Track your alpha against the S&P 500 and other benchmarks in real-time with permanent, undeletable trade records. No importing past data, no backdating, no gaming the system—only your actual performance from day one forward.
             </p>
             <Button 
-              className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2"
+              className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 text-lg"
               onClick={handleAuthRedirect}
             >
               Begin Tracking
             </Button>
           </div>
+        </div>
 
-          {/* Discover Hidden Trading Legends */}
-          <div className="text-center space-y-4">
-            <h3 className="text-xl font-bold text-gray-900">
+        {/* Discover Hidden Trading Legends */}
+        <div className="flex items-center gap-16 flex-row-reverse">
+          <div className="flex-1">
+            <img 
+              src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=600&h=400&fit=crop&crop=center"
+              alt="Community of traders around screens"
+              className="w-full h-96 object-cover rounded-lg shadow-lg"
+            />
+          </div>
+          <div className="flex-1 space-y-6">
+            <h3 className="text-4xl font-bold text-gray-900">
               Discover Hidden Trading Legends
             </h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
+            <p className="text-lg text-gray-600 leading-relaxed">
               Talented individual traders are crushing institutional returns but flying under the radar. Join the community where retail gets the recognition it deserves through transparent, verified performance.
             </p>
             <Button 
-              className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2"
+              className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 text-lg"
               onClick={handleAuthRedirect}
             >
               See Leaderboard
             </Button>
           </div>
+        </div>
 
-          {/* Learn from Proven Alpha Generators */}
-          <div className="text-center space-y-4">
-            <h3 className="text-xl font-bold text-gray-900">
+        {/* Learn from Proven Alpha Generators */}
+        <div className="flex items-center gap-16">
+          <div className="flex-1">
+            <img 
+              src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=400&fit=crop&crop=center"
+              alt="Code and analytics on MacBook"
+              className="w-full h-96 object-cover rounded-lg shadow-lg"
+            />
+          </div>
+          <div className="flex-1 space-y-6">
+            <h3 className="text-4xl font-bold text-gray-900">
               Learn from Proven Alpha Generators
             </h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
+            <p className="text-lg text-gray-600 leading-relaxed">
               Find consistently profitable investors and their portfolios in our community and track their strategies real-time. When someone's beating the market month after month, you'll want to pay attention.
             </p>
             <Button 
-              className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2"
+              className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 text-lg"
               onClick={handleAuthRedirect}
             >
               Explore Portfolios
