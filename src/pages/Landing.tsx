@@ -55,7 +55,7 @@ const Landing = () => {
           </h2>
           
           <p className="text-base text-gray-600 leading-relaxed">
-            Track Your Trades, Get Superior Insights, View What Top Traders Are Doing, And Much More At Trinko.Ai
+            Begin your journey at Trinko—where every trade counts and the best rise to the top.
           </p>
           
           <div className="pt-4">
