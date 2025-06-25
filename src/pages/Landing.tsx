@@ -3,8 +3,6 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import TopNavigation from '@/components/TopNavigation';
-import Footer from '@/components/Footer';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -27,15 +25,16 @@ const Landing = () => {
     }
   };
 
-  const handleAuthRedirect = () => {
-    navigate('/auth');
+  const handleWatchDemo = () => {
+    // TODO: Implement demo functionality
+    console.log('Watch demo clicked');
   };
 
   // Show loading state while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-gray-500">Loading...</div>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
       </div>
     );
   }
@@ -46,114 +45,50 @@ const Landing = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <TopNavigation />
-      
-      {/* Hero Section */}
-      <div className="flex items-center justify-center py-24">
-        <div className="text-center space-y-6 max-w-2xl px-8">
-          <h1 className="text-[8rem] font-black text-gray-900 tracking-tight leading-none">
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center px-8">
+      <div className="max-w-4xl mx-auto text-center space-y-8">
+        {/* Brand */}
+        <div className="mb-16">
+          <h1 className="text-2xl font-bold tracking-wider mb-8">TRINKO</h1>
+        </div>
+
+        {/* Main Headline */}
+        <div className="space-y-4">
+          <h2 className="text-8xl md:text-9xl font-black tracking-tight leading-none">
             S&P500
-          </h1>
-          
-          <h2 className="text-3xl font-bold text-gray-800">
-            Can You Beat It?
           </h2>
-          
-          <p className="text-base text-gray-600 leading-relaxed">
-            Begin your journey at Trinko—where every trade counts and the best rise to the top.
+          <h3 className="text-4xl md:text-5xl font-light tracking-wide">
+            CAN YOU BEAT IT?
+          </h3>
+        </div>
+
+        {/* Description */}
+        <div className="max-w-3xl mx-auto py-8">
+          <p className="text-lg md:text-xl leading-relaxed font-light">
+            TRACK YOUR TRADES. GET SUPERIOR ANALYTICS. MAXIMISE ALPHA. GO SOLO OR CREATE PORTFOLIOS WITH YOUR FRIENDS. COMPETE WITH OTHERS. AND SO MUCH MORE. BEGIN YOUR TRADING JOURNEY NOW.
           </p>
-          
-          <div className="pt-4">
-            <Button 
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg"
-              onClick={handleLaunchPortfolio}
-            >
-              Launch My Portfolio
-            </Button>
-          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="w-full h-px bg-white my-12"></div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
+          <Button
+            onClick={handleLaunchPortfolio}
+            className="bg-white text-black hover:bg-gray-200 px-8 py-4 text-lg font-semibold rounded-full min-w-48"
+          >
+            LAUNCH MY PORTFOLIO
+          </Button>
+          <Button
+            onClick={handleWatchDemo}
+            variant="outline"
+            className="border-white text-white hover:bg-white hover:text-black px-8 py-4 text-lg font-semibold rounded-full min-w-48"
+          >
+            WATCH DEMO
+          </Button>
         </div>
       </div>
-
-      {/* Features Section */}
-      <div className="max-w-7xl mx-auto px-8 py-32 space-y-32">
-        {/* Survival Mode Trading */}
-        <div className="flex items-center gap-16 even:flex-row-reverse">
-          <div className="flex-1">
-            <img 
-              src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=600&h=400&fit=crop&crop=center"
-              alt="Trading analytics on laptop"
-              className="w-full h-96 object-cover rounded-lg shadow-lg"
-            />
-          </div>
-          <div className="flex-1 space-y-6">
-            <h3 className="text-4xl font-bold text-gray-900">
-              Survival Mode Trading: No Cheating, Just Results
-            </h3>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              Can you outperform the market? Track your alpha against the S&P 500 and other benchmarks in real-time with permanent, undeletable trade records. No importing past data, no backdating, no gaming the system—only your actual performance from day one forward.
-            </p>
-            <Button 
-              className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 text-lg"
-              onClick={handleAuthRedirect}
-            >
-              Begin Tracking
-            </Button>
-          </div>
-        </div>
-
-        {/* Discover Hidden Trading Legends */}
-        <div className="flex items-center gap-16 flex-row-reverse">
-          <div className="flex-1">
-            <img 
-              src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=600&h=400&fit=crop&crop=center"
-              alt="Community of traders around screens"
-              className="w-full h-96 object-cover rounded-lg shadow-lg"
-            />
-          </div>
-          <div className="flex-1 space-y-6">
-            <h3 className="text-4xl font-bold text-gray-900">
-              Discover Hidden Trading Legends
-            </h3>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              Talented individual traders are crushing institutional returns but flying under the radar. Join the community where retail gets the recognition it deserves through transparent, verified performance.
-            </p>
-            <Button 
-              className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 text-lg"
-              onClick={handleAuthRedirect}
-            >
-              See Leaderboard
-            </Button>
-          </div>
-        </div>
-
-        {/* Learn from Proven Alpha Generators */}
-        <div className="flex items-center gap-16">
-          <div className="flex-1">
-            <img 
-              src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=400&fit=crop&crop=center"
-              alt="Code and analytics on MacBook"
-              className="w-full h-96 object-cover rounded-lg shadow-lg"
-            />
-          </div>
-          <div className="flex-1 space-y-6">
-            <h3 className="text-4xl font-bold text-gray-900">
-              Learn from Proven Alpha Generators
-            </h3>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              Find consistently profitable investors and their portfolios in our community and track their strategies real-time. When someone's beating the market month after month, you'll want to pay attention.
-            </p>
-            <Button 
-              className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 text-lg"
-              onClick={handleAuthRedirect}
-            >
-              Explore Portfolios
-            </Button>
-          </div>
-        </div>
-      </div>
-      
-      <Footer />
     </div>
   );
 };
