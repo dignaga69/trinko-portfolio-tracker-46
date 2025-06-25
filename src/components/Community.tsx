@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -1111,6 +1112,13 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
           )}
         </CardContent>
       </Card>
+
+      {/* Leaderboard refresh note */}
+      <div className="text-center">
+        <p className="text-xs text-gray-500">
+          Leaderboard refreshes daily at 00:00 UTC
+        </p>
+      </div>
 
       {/* Filter Dialogs */}
       <FilterDialog
