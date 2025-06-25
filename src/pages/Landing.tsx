@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import Footer from '@/components/Footer';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -52,10 +53,16 @@ const Landing = () => {
           TRINKO
         </div>
         <div className="flex gap-6">
-          <button className="text-white hover:text-gray-300 transition-colors">
+          <button 
+            className="text-white hover:text-gray-300 transition-colors"
+            onClick={() => navigate('/auth')}
+          >
             Login
           </button>
-          <button className="bg-white text-black px-6 py-2 rounded-full hover:bg-gray-200 transition-colors">
+          <button 
+            className="bg-white text-black px-6 py-2 rounded-full hover:bg-gray-200 transition-colors"
+            onClick={() => navigate('/auth')}
+          >
             Sign up
           </button>
         </div>
@@ -99,6 +106,9 @@ const Landing = () => {
           </div>
         </div>
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
