@@ -642,7 +642,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
                           label="USER" 
                           sortKey="user" 
@@ -650,49 +650,49 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-16">
+                      <TableHead className="text-center px-1 w-10">
                         <SortButton 
-                          label="TRADES (TOTAL)" 
+                          label={<div className="leading-tight">TRADES<br />(TOTAL)</div>}
                           sortKey="tradesTotal" 
                           currentSortConfig={leaderboardSortConfig}
                           onSort={handleLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-16">
+                      <TableHead className="text-center px-1 w-10">
                         <SortButton 
-                          label="TRADES (CLOSED)" 
+                          label={<div className="leading-tight">TRADES<br />(CLOSED)</div>}
                           sortKey="tradesClosed" 
                           currentSortConfig={leaderboardSortConfig}
                           onSort={handleLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="SUCCESS RATE (ALL)" 
+                          label={<div className="leading-tight">SUCCESS<br />RATE (ALL)</div>}
                           sortKey="successRateAll" 
                           currentSortConfig={leaderboardSortConfig}
                           onSort={handleLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="AVG ALPHA (ALL)" 
+                          label={<div className="leading-tight">AVG ALPHA<br />(ALL)</div>}
                           sortKey="avgAlphaAll" 
                           currentSortConfig={leaderboardSortConfig}
                           onSort={handleLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="SUCCESS RATE (CLOSED)" 
+                          label={<div className="leading-tight">SUCCESS<br />RATE (CLOSED)</div>}
                           sortKey="successRateClosed" 
                           currentSortConfig={leaderboardSortConfig}
                           onSort={handleLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="AVG ALPHA (CLOSED)" 
+                          label={<div className="leading-tight">AVG ALPHA<br />(CLOSED)</div>}
                           sortKey="avgAlphaClosed" 
                           currentSortConfig={leaderboardSortConfig}
                           onSort={handleLeaderboardSort}
@@ -812,7 +812,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-center px-1 w-24">
+                      <TableHead className="text-center px-1 w-14">
                         <SortButton 
                           label="PORTFOLIO" 
                           sortKey="portfolio" 
@@ -820,7 +820,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handlePortfolioLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
                           label="USER" 
                           sortKey="user" 
@@ -828,49 +828,49 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handlePortfolioLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-16">
+                      <TableHead className="text-center px-1 w-10">
                         <SortButton 
-                          label="TRADES (PORTFOLIO)" 
+                          label={<div className="leading-tight">TRADES<br />(PORTFOLIO)</div>}
                           sortKey="tradesPortfolio" 
                           currentSortConfig={portfolioLeaderboardSortConfig}
                           onSort={handlePortfolioLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-16">
+                      <TableHead className="text-center px-1 w-10">
                         <SortButton 
-                          label="TRADES (CLOSED)" 
+                          label={<div className="leading-tight">TRADES<br />(CLOSED)</div>}
                           sortKey="tradesClosed" 
                           currentSortConfig={portfolioLeaderboardSortConfig}
                           onSort={handlePortfolioLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="SUCCESS RATE (ALL)" 
+                          label={<div className="leading-tight">SUCCESS<br />RATE (ALL)</div>}
                           sortKey="successRateAll" 
                           currentSortConfig={portfolioLeaderboardSortConfig}
                           onSort={handlePortfolioLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="AVG ALPHA (ALL)" 
+                          label={<div className="leading-tight">AVG ALPHA<br />(ALL)</div>}
                           sortKey="avgAlphaAll" 
                           currentSortConfig={portfolioLeaderboardSortConfig}
                           onSort={handlePortfolioLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="SUCCESS RATE (CLOSED)" 
+                          label={<div className="leading-tight">SUCCESS<br />RATE (CLOSED)</div>}
                           sortKey="successRateClosed" 
                           currentSortConfig={portfolioLeaderboardSortConfig}
                           onSort={handlePortfolioLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="AVG ALPHA (CLOSED)" 
+                          label={<div className="leading-tight">AVG ALPHA<br />(CLOSED)</div>}
                           sortKey="avgAlphaClosed" 
                           currentSortConfig={portfolioLeaderboardSortConfig}
                           onSort={handlePortfolioLeaderboardSort}
@@ -999,7 +999,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-center px-1 w-16">
+                      <TableHead className="text-center px-1 w-10">
                         <SortButton 
                           label="TICKER" 
                           sortKey="ticker" 
@@ -1007,15 +1007,15 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="ENTRY DATE" 
+                          label={<div className="leading-tight">ENTRY<br />DATE</div>}
                           sortKey="entryDate"
                           currentSortConfig={bestTradesSortConfig}
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-16">
+                      <TableHead className="text-center px-1 w-10">
                         <SortButton 
                           label="SIDE" 
                           sortKey="side" 
@@ -1023,47 +1023,47 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="ENTRY PRICE" 
+                          label={<div className="leading-tight">ENTRY<br />PRICE</div>}
                           sortKey="entryPrice" 
                           currentSortConfig={bestTradesSortConfig}
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="CLOSE DATE" 
+                          label={<div className="leading-tight">CLOSE<br />DATE</div>}
                           sortKey="closeDate" 
                           currentSortConfig={bestTradesSortConfig}
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="EXIT PRICE" 
+                          label={<div className="leading-tight">EXIT<br />PRICE</div>}
                           sortKey="exitPrice" 
                           currentSortConfig={bestTradesSortConfig}
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="TICKER RETURN" 
+                          label={<div className="leading-tight">TICKER<br />RETURN</div>}
                           sortKey="tickerReturn" 
                           currentSortConfig={bestTradesSortConfig}
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
-                          label="S&P500 RETURN" 
+                          label={<div className="leading-tight">S&P500<br />RETURN</div>}
                           sortKey="sp500Return" 
                           currentSortConfig={bestTradesSortConfig}
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-16">
+                      <TableHead className="text-center px-1 w-10">
                         <SortButton 
                           label="ALPHA" 
                           sortKey="alpha" 
@@ -1071,7 +1071,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-1 w-20">
+                      <TableHead className="text-center px-1 w-12">
                         <SortButton 
                           label="USER" 
                           sortKey="user" 
