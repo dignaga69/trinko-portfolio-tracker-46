@@ -11,6 +11,8 @@ import Community from '@/components/Community';
 import Footer from '@/components/Footer';
 import { FileText, BarChart3, Trophy, Folder } from 'lucide-react';
 import PortfolioManager from '@/components/PortfolioManager';
+import SharedPortfolioManager from '@/components/SharedPortfolioManager';
+import { Button } from '@/components/ui/button';
 
 interface Trade {
   id: string;
@@ -24,11 +26,22 @@ interface Trade {
   exitDate?: Date;
   closeReason?: string;
   portfolioId: string;
+  isShared?: boolean;
 }
 
 interface Portfolio {
   id: string;
   name: string;
+  createdAt: Date;
+  isShared?: boolean;
+}
+
+interface SharedPortfolio {
+  id: string;
+  name: string;
+  adminId: string;
+  adminName: string;
+  members: { id: string; name: string; email: string }[];
   createdAt: Date;
 }
 
@@ -38,8 +51,10 @@ const Index = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState('portfolio');
+  const [portfolioView, setPortfolioView] = useState<'personal' | 'shared'>('personal');
   const [trades, setTrades] = useState<Trade[]>([]);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+  const [sharedPortfolios, setSharedPortfolios] = useState<SharedPortfolio[]>([]);
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<string>('');
 
   // Check if user is logged in, if not redirect to landing
@@ -81,8 +96,45 @@ const Index = () => {
   const handleDeletePortfolio = (id: string) => {
     setPortfolios(prev => prev.filter(portfolio => portfolio.id !== id));
     // Remove trades from deleted portfolio
+    setTrades(prev => prev.filter(trade => trade.portfolioId !== id || trade.isShared));
+    // If deleted portfolio was selected, clear selection
+    if (selectedPortfolioId === id) {
+      setSelectedPortfolioId('');
+    }
+  };
+
+  // Shared portfolio management functions
+  const handleCreateSharedPortfolio = (name: string, inviteEmails: string[]) => {
+    const sharedPortfolio: SharedPortfolio = {
+      id: `shared_${Date.now()}`,
+      name,
+      adminId: user?.id || 'current_user',
+      adminName: user?.user_metadata?.full_name || 'You',
+      members: inviteEmails.map((email, index) => ({
+        id: `member_${index}`,
+        name: email.split('@')[0],
+        email
+      })),
+      createdAt: new Date(),
+    };
+    setSharedPortfolios(prev => [...prev, sharedPortfolio]);
+  };
+
+  const handleDeleteSharedPortfolio = (id: string) => {
+    setSharedPortfolios(prev => prev.filter(portfolio => portfolio.id !== id));
+    // Remove trades from deleted shared portfolio
     setTrades(prev => prev.filter(trade => trade.portfolioId !== id));
     // If deleted portfolio was selected, clear selection
+    if (selectedPortfolioId === id) {
+      setSelectedPortfolioId('');
+    }
+  };
+
+  const handleLeaveSharedPortfolio = (id: string) => {
+    setSharedPortfolios(prev => prev.filter(portfolio => portfolio.id !== id));
+    // Remove trades from left shared portfolio
+    setTrades(prev => prev.filter(trade => trade.portfolioId !== id));
+    // If left portfolio was selected, clear selection
     if (selectedPortfolioId === id) {
       setSelectedPortfolioId('');
     }
@@ -92,6 +144,7 @@ const Index = () => {
     const trade: Trade = {
       ...newTrade,
       id: Date.now().toString(),
+      isShared: sharedPortfolios.some(sp => sp.id === newTrade.portfolioId)
     };
     setTrades(prev => [...prev, trade]);
   };
@@ -123,22 +176,71 @@ const Index = () => {
     return configs[activeSection as keyof typeof configs] || configs.portfolio;
   };
 
+  // Combine regular and shared portfolios for trade logging and performance
+  const getAllPortfolios = () => {
+    const regularPortfolios = portfolios.map(p => ({ ...p, type: 'personal' as const }));
+    const sharedPortfoliosAsPortfolios = sharedPortfolios.map(sp => ({
+      id: sp.id,
+      name: sp.name,
+      createdAt: sp.createdAt,
+      type: 'shared' as const,
+      isShared: true
+    }));
+    return [...regularPortfolios, ...sharedPortfoliosAsPortfolios];
+  };
+
   const renderContent = () => {
     switch (activeSection) {
       case 'portfolio':
         return (
-          <PortfolioManager
-            portfolios={portfolios}
-            onCreatePortfolio={handleCreatePortfolio}
-            onRenamePortfolio={handleRenamePortfolio}
-            onDeletePortfolio={handleDeletePortfolio}
-          />
+          <div className="space-y-6">
+            {/* Toggle between personal and shared portfolios */}
+            <div className="flex space-x-1 bg-gray-50 p-1 rounded-lg w-fit">
+              <button
+                onClick={() => setPortfolioView('personal')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  portfolioView === 'personal' 
+                    ? 'bg-white text-gray-900 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Your Portfolios
+              </button>
+              <button
+                onClick={() => setPortfolioView('shared')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  portfolioView === 'shared' 
+                    ? 'bg-white text-gray-900 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Shared Portfolios
+              </button>
+            </div>
+
+            {portfolioView === 'personal' ? (
+              <PortfolioManager
+                portfolios={portfolios}
+                onCreatePortfolio={handleCreatePortfolio}
+                onRenamePortfolio={handleRenamePortfolio}
+                onDeletePortfolio={handleDeletePortfolio}
+              />
+            ) : (
+              <SharedPortfolioManager
+                sharedPortfolios={sharedPortfolios}
+                currentUserId={user?.id || 'current_user'}
+                onCreateSharedPortfolio={handleCreateSharedPortfolio}
+                onDeleteSharedPortfolio={handleDeleteSharedPortfolio}
+                onLeaveSharedPortfolio={handleLeaveSharedPortfolio}
+              />
+            )}
+          </div>
         );
       case 'log-trade':
         return (
           <LogTradeWrapper 
             trades={trades}
-            portfolios={portfolios}
+            portfolios={getAllPortfolios()}
             onAddTrade={handleAddTrade}
             onCloseTrade={handleCloseTrade}
           />
@@ -147,7 +249,7 @@ const Index = () => {
         return (
           <PerformanceWrapper 
             trades={trades} 
-            portfolios={portfolios}
+            portfolios={getAllPortfolios()}
             selectedPortfolioId={selectedPortfolioId}
             onPortfolioChange={setSelectedPortfolioId}
           />
@@ -156,12 +258,48 @@ const Index = () => {
         return <Community isUserPrivate={isPrivate} />;
       default:
         return (
-          <PortfolioManager
-            portfolios={portfolios}
-            onCreatePortfolio={handleCreatePortfolio}
-            onRenamePortfolio={handleRenamePortfolio}
-            onDeletePortfolio={handleDeletePortfolio}
-          />
+          <div className="space-y-6">
+            {/* Toggle between personal and shared portfolios */}
+            <div className="flex space-x-1 bg-gray-50 p-1 rounded-lg w-fit">
+              <button
+                onClick={() => setPortfolioView('personal')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  portfolioView === 'personal' 
+                    ? 'bg-white text-gray-900 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Your Portfolios
+              </button>
+              <button
+                onClick={() => setPortfolioView('shared')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  portfolioView === 'shared' 
+                    ? 'bg-white text-gray-900 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Shared Portfolios
+              </button>
+            </div>
+
+            {portfolioView === 'personal' ? (
+              <PortfolioManager
+                portfolios={portfolios}
+                onCreatePortfolio={handleCreatePortfolio}
+                onRenamePortfolio={handleRenamePortfolio}
+                onDeletePortfolio={handleDeletePortfolio}
+              />
+            ) : (
+              <SharedPortfolioManager
+                sharedPortfolios={sharedPortfolios}
+                currentUserId={user?.id || 'current_user'}
+                onCreateSharedPortfolio={handleCreateSharedPortfolio}
+                onDeleteSharedPortfolio={handleDeleteSharedPortfolio}
+                onLeaveSharedPortfolio={handleLeaveSharedPortfolio}
+              />
+            )}
+          </div>
         );
     }
   };
