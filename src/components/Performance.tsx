@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { usePrivacy } from '@/contexts/PrivacyContext';
 import PrivacyToggle from './PrivacyToggle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from 'react';
 
 interface Trade {
   id: string;
@@ -21,12 +22,17 @@ interface Trade {
   exitDate?: Date;
   closeReason?: string;
   portfolioId: string;
+  isShared?: boolean;
+  userId?: string;
+  userName?: string;
 }
 
 interface Portfolio {
   id: string;
   name: string;
   createdAt: Date;
+  type?: 'personal' | 'shared';
+  isShared?: boolean;
 }
 
 interface PerformanceProps {
@@ -38,11 +44,28 @@ interface PerformanceProps {
 
 const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChange }: PerformanceProps) => {
   const { isPrivate, setIsPrivate } = usePrivacy();
+  const [portfolioType, setPortfolioType] = useState<'individual' | 'shared'>('individual');
+
+  // Filter portfolios by type
+  const filteredPortfolios = portfolios.filter(portfolio => {
+    if (portfolioType === 'individual') {
+      return !portfolio.isShared && portfolio.type !== 'shared';
+    } else {
+      return portfolio.isShared || portfolio.type === 'shared';
+    }
+  });
 
   // Filter trades by selected portfolio
   const filteredTrades = selectedPortfolioId && selectedPortfolioId !== 'all'
     ? trades.filter(trade => trade.portfolioId === selectedPortfolioId)
-    : trades;
+    : trades.filter(trade => {
+        const portfolio = portfolios.find(p => p.id === trade.portfolioId);
+        if (portfolioType === 'individual') {
+          return !portfolio?.isShared && portfolio?.type !== 'shared';
+        } else {
+          return portfolio?.isShared || portfolio?.type === 'shared';
+        }
+      });
 
   const calculateReturns = (trade: Trade) => {
     if (trade.status === 'open') {
@@ -68,6 +91,7 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
     return { tickerReturn, sp500Return, alpha };
   };
 
+  // Filter closed trades by success
   const closedTrades = filteredTrades.filter(trade => trade.status === 'closed');
   const openTrades = filteredTrades.filter(trade => trade.status === 'open');
   const successfulTrades = closedTrades.filter(trade => {
@@ -93,7 +117,16 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
   const successRateAll = totalTrades > 0 ? (allSuccessfulTrades.length / totalTrades) * 100 : 0;
   const successRateClosed = closedTrades.length > 0 ? (successfulTrades.length / closedTrades.length) * 100 : 0;
 
-  const selectedPortfolio = portfolios.find(p => p.id === selectedPortfolioId);
+  const selectedPortfolio = filteredPortfolios.find(p => p.id === selectedPortfolioId);
+  const isSharedPortfolioSelected = selectedPortfolio?.isShared || selectedPortfolio?.type === 'shared';
+
+  // Mock user data for shared portfolio trades
+  const getUserName = (trade: Trade) => {
+    if (trade.userName) return trade.userName;
+    // Mock user names for demonstration
+    const mockUsers = ['John D.', 'Sarah M.', 'Mike R.', 'Lisa K.', 'Tom B.'];
+    return mockUsers[Math.floor(Math.random() * mockUsers.length)];
+  };
 
   return (
     <div className="space-y-6">
@@ -143,10 +176,39 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
       {/* Privacy Toggle */}
       <PrivacyToggle isPrivate={isPrivate} onToggle={setIsPrivate} />
 
-      {/* Portfolio Selector */}
+      {/* Portfolio Type Toggle */}
       <Card className="border-0 shadow-none bg-gray-50">
         <CardContent className="pt-6">
           <div className="space-y-4">
+            <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+              <button
+                onClick={() => {
+                  setPortfolioType('individual');
+                  onPortfolioChange('all');
+                }}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  portfolioType === 'individual' 
+                    ? 'bg-white text-gray-900 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Individual Portfolio
+              </button>
+              <button
+                onClick={() => {
+                  setPortfolioType('shared');
+                  onPortfolioChange('all');
+                }}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  portfolioType === 'shared' 
+                    ? 'bg-white text-gray-900 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Shared Portfolio
+              </button>
+            </div>
+
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium text-gray-700">
                 Select Portfolio
@@ -156,8 +218,8 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
                   <SelectValue placeholder="All Portfolios" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Portfolios</SelectItem>
-                  {portfolios.map((portfolio) => (
+                  <SelectItem value="all">All {portfolioType} Portfolios</SelectItem>
+                  {filteredPortfolios.map((portfolio) => (
                     <SelectItem key={portfolio.id} value={portfolio.id}>
                       {portfolio.name}
                     </SelectItem>
@@ -169,6 +231,7 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
         </CardContent>
       </Card>
 
+      {/* Overview Section */}
       <Card className="border-0 shadow-none bg-gray-50">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Overview</CardTitle>
@@ -235,6 +298,7 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
         </CardContent>
       </Card>
 
+      {/* Trade History Section */}
       <Card className="border-0 shadow-none bg-gray-50">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Trade History</CardTitle>
@@ -244,7 +308,7 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
             <p className="text-sm text-gray-500 text-center py-8">
               {selectedPortfolio 
                 ? `No trades found for ${selectedPortfolio.name}.`
-                : 'No trades logged yet. Start by logging your first trade.'
+                : `No ${portfolioType} trades logged yet. Start by logging your first trade.`
               }
             </p>
           ) : (
@@ -255,6 +319,11 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
                     <th className="text-left py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
                       Portfolio
                     </th>
+                    {(isSharedPortfolioSelected || portfolioType === 'shared') && (
+                      <th className="text-left py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                        User
+                      </th>
+                    )}
                     <th className="text-left py-3 px-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
                       Ticker
                     </th>
@@ -288,11 +357,18 @@ const Performance = ({ trades, portfolios, selectedPortfolioId, onPortfolioChang
                   {filteredTrades.map((trade) => {
                     const returns = calculateReturns(trade);
                     const portfolio = portfolios.find(p => p.id === trade.portfolioId);
+                    const showUserColumn = (portfolio?.isShared || portfolio?.type === 'shared') && portfolioType === 'shared';
+                    
                     return (
                       <tr key={trade.id} className="border-b border-gray-100 hover:bg-gray-25">
                         <td className="py-3 px-2 text-sm text-gray-600 font-mono">
                           {portfolio?.name || 'Unknown'}
                         </td>
+                        {(isSharedPortfolioSelected || portfolioType === 'shared') && (
+                          <td className="py-3 px-2 text-sm text-gray-600 font-mono">
+                            {showUserColumn ? getUserName(trade) : 'You'}
+                          </td>
+                        )}
                         <td className="py-3 px-2 text-sm font-medium text-gray-900 font-mono">
                           {trade.ticker}
                         </td>
