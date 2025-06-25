@@ -48,7 +48,7 @@ const Landing = () => {
     <div className="min-h-screen bg-black text-white flex flex-col">
       {/* Header */}
       <header className="flex justify-between items-center px-8 py-6">
-        <div className="text-xl font-bold tracking-wider">
+        <div className="text-2xl font-black text-gray-900>
           TRINKO
         </div>
         <div className="flex gap-6">
