@@ -49,9 +49,12 @@ const Landing = () => {
     <div className="min-h-screen bg-black text-white flex flex-col">
       {/* Header */}
       <header className="flex justify-between items-center px-8 py-6">
-        <div className="text-xl font-bold tracking-wider">
+        <h1 
+          className="text-2xl font-black text-white tracking-tight cursor-pointer hover:text-gray-300 transition-colors"
+          onClick={() => navigate('/')}
+        >
           TRINKO
-        </div>
+        </h1>
         <div className="flex gap-6">
           <button 
             className="text-white hover:text-gray-300 transition-colors"
