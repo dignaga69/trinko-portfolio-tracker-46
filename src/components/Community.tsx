@@ -642,7 +642,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-20">
                         <SortButton 
                           label="USER" 
                           sortKey="user" 
@@ -650,7 +650,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-16">
                         <SortButton 
                           label="TRADES (TOTAL)" 
                           sortKey="tradesTotal" 
@@ -658,23 +658,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
-                        <SortButton 
-                          label="SUCCESS RATE (ALL)" 
-                          sortKey="successRateAll" 
-                          currentSortConfig={leaderboardSortConfig}
-                          onSort={handleLeaderboardSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-center px-2">
-                        <SortButton 
-                          label="AVG ALPHA (ALL)" 
-                          sortKey="avgAlphaAll" 
-                          currentSortConfig={leaderboardSortConfig}
-                          onSort={handleLeaderboardSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-16">
                         <SortButton 
                           label="TRADES (CLOSED)" 
                           sortKey="tradesClosed" 
@@ -682,7 +666,23 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-20">
+                        <SortButton 
+                          label="SUCCESS RATE (ALL)" 
+                          sortKey="successRateAll" 
+                          currentSortConfig={leaderboardSortConfig}
+                          onSort={handleLeaderboardSort}
+                        />
+                      </TableHead>
+                      <TableHead className="text-center px-1 w-20">
+                        <SortButton 
+                          label="AVG ALPHA (ALL)" 
+                          sortKey="avgAlphaAll" 
+                          currentSortConfig={leaderboardSortConfig}
+                          onSort={handleLeaderboardSort}
+                        />
+                      </TableHead>
+                      <TableHead className="text-center px-1 w-20">
                         <SortButton 
                           label="SUCCESS RATE (CLOSED)" 
                           sortKey="successRateClosed" 
@@ -690,7 +690,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-20">
                         <SortButton 
                           label="AVG ALPHA (CLOSED)" 
                           sortKey="avgAlphaClosed" 
@@ -703,17 +703,17 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                   <TableBody>
                     {paginatedLeaderboard.map((trader, index) => (
                       <TableRow key={index}>
-                        <TableCell className="text-center font-semibold px-2 py-2 text-xs">{trader.user}</TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">{trader.tradesTotal}</TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">{trader.successRateAll.toFixed(1)}%</TableCell>
-                        <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
+                        <TableCell className="text-center font-semibold px-1 py-1 text-xs">{trader.user}</TableCell>
+                        <TableCell className="text-center px-1 py-1 text-xs">{trader.tradesTotal}</TableCell>
+                        <TableCell className="text-center px-1 py-1 text-xs">{trader.tradesClosed}</TableCell>
+                        <TableCell className="text-center px-1 py-1 text-xs">{trader.successRateAll.toFixed(1)}%</TableCell>
+                        <TableCell className={`text-center font-semibold px-1 py-1 text-xs ${
                           trader.avgAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
                           {trader.avgAlphaAll >= 0 ? '+' : ''}{trader.avgAlphaAll.toFixed(1)}%
                         </TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">{trader.tradesClosed}</TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">{trader.successRateClosed.toFixed(1)}%</TableCell>
-                        <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
+                        <TableCell className="text-center px-1 py-1 text-xs">{trader.successRateClosed.toFixed(1)}%</TableCell>
+                        <TableCell className={`text-center font-semibold px-1 py-1 text-xs ${
                           trader.avgAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
                           {trader.avgAlphaClosed >= 0 ? '+' : ''}{trader.avgAlphaClosed.toFixed(1)}%
@@ -812,7 +812,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-24">
                         <SortButton 
                           label="PORTFOLIO" 
                           sortKey="portfolio" 
@@ -820,7 +820,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handlePortfolioLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-20">
                         <SortButton 
                           label="USER" 
                           sortKey="user" 
@@ -828,7 +828,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handlePortfolioLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-16">
                         <SortButton 
                           label="TRADES (PORTFOLIO)" 
                           sortKey="tradesPortfolio" 
@@ -836,23 +836,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handlePortfolioLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
-                        <SortButton 
-                          label="SUCCESS RATE (ALL)" 
-                          sortKey="successRateAll" 
-                          currentSortConfig={portfolioLeaderboardSortConfig}
-                          onSort={handlePortfolioLeaderboardSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-center px-2">
-                        <SortButton 
-                          label="AVG ALPHA (ALL)" 
-                          sortKey="avgAlphaAll" 
-                          currentSortConfig={portfolioLeaderboardSortConfig}
-                          onSort={handlePortfolioLeaderboardSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-16">
                         <SortButton 
                           label="TRADES (CLOSED)" 
                           sortKey="tradesClosed" 
@@ -860,7 +844,23 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handlePortfolioLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-20">
+                        <SortButton 
+                          label="SUCCESS RATE (ALL)" 
+                          sortKey="successRateAll" 
+                          currentSortConfig={portfolioLeaderboardSortConfig}
+                          onSort={handlePortfolioLeaderboardSort}
+                        />
+                      </TableHead>
+                      <TableHead className="text-center px-1 w-20">
+                        <SortButton 
+                          label="AVG ALPHA (ALL)" 
+                          sortKey="avgAlphaAll" 
+                          currentSortConfig={portfolioLeaderboardSortConfig}
+                          onSort={handlePortfolioLeaderboardSort}
+                        />
+                      </TableHead>
+                      <TableHead className="text-center px-1 w-20">
                         <SortButton 
                           label="SUCCESS RATE (CLOSED)" 
                           sortKey="successRateClosed" 
@@ -868,7 +868,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handlePortfolioLeaderboardSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-20">
                         <SortButton 
                           label="AVG ALPHA (CLOSED)" 
                           sortKey="avgAlphaClosed" 
@@ -881,18 +881,18 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                   <TableBody>
                     {paginatedPortfolioLeaderboard.map((portfolio, index) => (
                       <TableRow key={index}>
-                        <TableCell className="text-center font-semibold px-2 py-2 text-xs">{portfolio.portfolio}</TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">{portfolio.user}</TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">{portfolio.tradesPortfolio}</TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">{portfolio.successRateAll.toFixed(1)}%</TableCell>
-                        <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
+                        <TableCell className="text-center font-semibold px-1 py-1 text-xs">{portfolio.portfolio}</TableCell>
+                        <TableCell className="text-center px-1 py-1 text-xs">{portfolio.user}</TableCell>
+                        <TableCell className="text-center px-1 py-1 text-xs">{portfolio.tradesPortfolio}</TableCell>
+                        <TableCell className="text-center px-1 py-1 text-xs">{portfolio.tradesClosed}</TableCell>
+                        <TableCell className="text-center px-1 py-1 text-xs">{portfolio.successRateAll.toFixed(1)}%</TableCell>
+                        <TableCell className={`text-center font-semibold px-1 py-1 text-xs ${
                           portfolio.avgAlphaAll >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
                           {portfolio.avgAlphaAll >= 0 ? '+' : ''}{portfolio.avgAlphaAll.toFixed(1)}%
                         </TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">{portfolio.tradesClosed}</TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">{portfolio.successRateClosed.toFixed(1)}%</TableCell>
-                        <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
+                        <TableCell className="text-center px-1 py-1 text-xs">{portfolio.successRateClosed.toFixed(1)}%</TableCell>
+                        <TableCell className={`text-center font-semibold px-1 py-1 text-xs ${
                           portfolio.avgAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
                           {portfolio.avgAlphaClosed >= 0 ? '+' : ''}{portfolio.avgAlphaClosed.toFixed(1)}%
@@ -999,7 +999,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-16">
                         <SortButton 
                           label="TICKER" 
                           sortKey="ticker" 
@@ -1007,7 +1007,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-20">
                         <SortButton 
                           label="ENTRY DATE" 
                           sortKey="entryDate"
@@ -1015,7 +1015,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-16">
                         <SortButton 
                           label="SIDE" 
                           sortKey="side" 
@@ -1023,7 +1023,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-20">
                         <SortButton 
                           label="ENTRY PRICE" 
                           sortKey="entryPrice" 
@@ -1031,7 +1031,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-20">
                         <SortButton 
                           label="CLOSE DATE" 
                           sortKey="closeDate" 
@@ -1039,7 +1039,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-20">
                         <SortButton 
                           label="EXIT PRICE" 
                           sortKey="exitPrice" 
@@ -1047,7 +1047,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-20">
                         <SortButton 
                           label="TICKER RETURN" 
                           sortKey="tickerReturn" 
@@ -1055,7 +1055,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-20">
                         <SortButton 
                           label="S&P500 RETURN" 
                           sortKey="sp500Return" 
@@ -1063,7 +1063,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-16">
                         <SortButton 
                           label="ALPHA" 
                           sortKey="alpha" 
@@ -1071,7 +1071,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                           onSort={handleBestTradesSort}
                         />
                       </TableHead>
-                      <TableHead className="text-center px-2">
+                      <TableHead className="text-center px-1 w-20">
                         <SortButton 
                           label="USER" 
                           sortKey="user" 
@@ -1084,34 +1084,34 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                   <TableBody>
                     {paginatedBestTrades.map((trade, index) => (
                       <TableRow key={index}>
-                        <TableCell className="text-center font-semibold px-2 py-2 text-xs">{trade.ticker}</TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">{trade.entryDate}</TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">
-                          <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                        <TableCell className="text-center font-semibold px-1 py-1 text-xs">{trade.ticker}</TableCell>
+                        <TableCell className="text-center px-1 py-1 text-xs">{trade.entryDate}</TableCell>
+                        <TableCell className="text-center px-1 py-1 text-xs">
+                          <span className={`px-1 py-0.5 rounded text-xs font-semibold ${
                             trade.side === 'LONG' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                           }`}>
                             {trade.side}
                           </span>
                         </TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">${trade.entryPrice.toFixed(2)}</TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">{trade.closeDate}</TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">${trade.exitPrice.toFixed(2)}</TableCell>
-                        <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
+                        <TableCell className="text-center px-1 py-1 text-xs">${trade.entryPrice.toFixed(2)}</TableCell>
+                        <TableCell className="text-center px-1 py-1 text-xs">{trade.closeDate}</TableCell>
+                        <TableCell className="text-center px-1 py-1 text-xs">${trade.exitPrice.toFixed(2)}</TableCell>
+                        <TableCell className={`text-center font-semibold px-1 py-1 text-xs ${
                           trade.tickerReturn >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
                           {trade.tickerReturn >= 0 ? '+' : ''}{trade.tickerReturn.toFixed(2)}%
                         </TableCell>
-                        <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
+                        <TableCell className={`text-center font-semibold px-1 py-1 text-xs ${
                           trade.sp500Return >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
                           {trade.sp500Return >= 0 ? '+' : ''}{trade.sp500Return.toFixed(2)}%
                         </TableCell>
-                        <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
+                        <TableCell className={`text-center font-semibold px-1 py-1 text-xs ${
                           trade.alpha >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
                           {trade.alpha >= 0 ? '+' : ''}{trade.alpha.toFixed(2)}%
                         </TableCell>
-                        <TableCell className="text-center px-2 py-2 text-xs">{trade.user}</TableCell>
+                        <TableCell className="text-center px-1 py-1 text-xs">{trade.user}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
