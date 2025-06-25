@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -54,6 +53,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
   // Advanced filter states for Leaderboard
   const [leaderboardFilters, setLeaderboardFilters] = useState({
     tradesTotal: { condition: '', value: '', value2: '' },
+    tradesClosed: { condition: '', value: '', value2: '' },
     successRateAll: { condition: '', value: '', value2: '' },
     avgAlphaAll: { condition: '', value: '', value2: '' },
     successRateClosed: { condition: '', value: '', value2: '' },
@@ -63,6 +63,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
   // Advanced filter states for Portfolio Leaderboard
   const [portfolioLeaderboardFilters, setPortfolioLeaderboardFilters] = useState({
     tradesPortfolio: { condition: '', value: '', value2: '' },
+    tradesClosed: { condition: '', value: '', value2: '' },
     successRateAll: { condition: '', value: '', value2: '' },
     avgAlphaAll: { condition: '', value: '', value2: '' },
     successRateClosed: { condition: '', value: '', value2: '' },
@@ -98,6 +99,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
   const mockLeaderboard = Array.from({ length: 45 }, (_, i) => ({
     user: `Trader${i + 1}`,
     tradesTotal: 20 + (i % 50),
+    tradesClosed: 15 + (i % 40),
     successRateAll: 50 + (i % 40),
     avgAlphaAll: -5 + (i % 25),
     successRateClosed: 55 + (i % 35),
@@ -109,6 +111,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
     portfolio: ['Tech Growth', 'Value Plays', 'Momentum', 'Blue Chips', 'Small Caps'][i % 5],
     user: `Trader${Math.floor(i / 5) + 1}`,
     tradesPortfolio: 5 + (i % 20),
+    tradesClosed: 3 + (i % 15),
     successRateAll: 45 + (i % 50),
     avgAlphaAll: -8 + (i % 30),
     successRateClosed: 50 + (i % 40),
@@ -197,6 +200,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
     return data.filter(item => {
       if (leaderboardSearch && !item.user.toLowerCase().includes(leaderboardSearch.toLowerCase())) return false;
       if (!checkFilterCondition(item.tradesTotal, leaderboardFilters.tradesTotal)) return false;
+      if (!checkFilterCondition(item.tradesClosed, leaderboardFilters.tradesClosed)) return false;
       if (!checkFilterCondition(item.successRateAll, leaderboardFilters.successRateAll)) return false;
       if (!checkFilterCondition(item.avgAlphaAll, leaderboardFilters.avgAlphaAll)) return false;
       if (!checkFilterCondition(item.successRateClosed, leaderboardFilters.successRateClosed)) return false;
@@ -211,6 +215,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
           !item.portfolio.toLowerCase().includes(portfolioLeaderboardSearch.toLowerCase()) &&
           !item.user.toLowerCase().includes(portfolioLeaderboardSearch.toLowerCase())) return false;
       if (!checkFilterCondition(item.tradesPortfolio, portfolioLeaderboardFilters.tradesPortfolio)) return false;
+      if (!checkFilterCondition(item.tradesClosed, portfolioLeaderboardFilters.tradesClosed)) return false;
       if (!checkFilterCondition(item.successRateAll, portfolioLeaderboardFilters.successRateAll)) return false;
       if (!checkFilterCondition(item.avgAlphaAll, portfolioLeaderboardFilters.avgAlphaAll)) return false;
       if (!checkFilterCondition(item.successRateClosed, portfolioLeaderboardFilters.successRateClosed)) return false;
@@ -249,6 +254,10 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
       case 'tradesTotal':
         aValue = a.tradesTotal;
         bValue = b.tradesTotal;
+        break;
+      case 'tradesClosed':
+        aValue = a.tradesClosed;
+        bValue = b.tradesClosed;
         break;
       case 'successRateAll':
         aValue = a.successRateAll;
@@ -291,6 +300,10 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
       case 'tradesPortfolio':
         aValue = a.tradesPortfolio;
         bValue = b.tradesPortfolio;
+        break;
+      case 'tradesClosed':
+        aValue = a.tradesClosed;
+        bValue = b.tradesClosed;
         break;
       case 'successRateAll':
         aValue = a.successRateAll;
@@ -591,12 +604,17 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                 />
               </div>
               
-              {/* Advanced Filter Buttons - Updated order */}
+              {/* Advanced Filter Buttons */}
               <div className="flex flex-wrap gap-2">
                 <FilterButton
                   label="Trades (Total)"
                   filterKey="leaderboard-tradesTotal"
                   hasActiveFilter={!!leaderboardFilters.tradesTotal.condition}
+                />
+                <FilterButton
+                  label="Trades (Closed)"
+                  filterKey="leaderboard-tradesClosed"
+                  hasActiveFilter={!!leaderboardFilters.tradesClosed.condition}
                 />
                 <FilterButton
                   label="Success Rate (All)"
@@ -658,6 +676,14 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                       </TableHead>
                       <TableHead className="text-center px-2">
                         <SortButton 
+                          label="TRADES (CLOSED)" 
+                          sortKey="tradesClosed" 
+                          currentSortConfig={leaderboardSortConfig}
+                          onSort={handleLeaderboardSort}
+                        />
+                      </TableHead>
+                      <TableHead className="text-center px-2">
+                        <SortButton 
                           label="SUCCESS RATE (CLOSED)" 
                           sortKey="successRateClosed" 
                           currentSortConfig={leaderboardSortConfig}
@@ -685,6 +711,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                         }`}>
                           {trader.avgAlphaAll >= 0 ? '+' : ''}{trader.avgAlphaAll.toFixed(1)}%
                         </TableCell>
+                        <TableCell className="text-center px-2 py-2 text-xs">{trader.tradesClosed}</TableCell>
                         <TableCell className="text-center px-2 py-2 text-xs">{trader.successRateClosed.toFixed(1)}%</TableCell>
                         <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
                           trader.avgAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'
@@ -755,6 +782,11 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                   hasActiveFilter={!!portfolioLeaderboardFilters.tradesPortfolio.condition}
                 />
                 <FilterButton
+                  label="Trades (Closed)"
+                  filterKey="portfolioLeaderboard-tradesClosed"
+                  hasActiveFilter={!!portfolioLeaderboardFilters.tradesClosed.condition}
+                />
+                <FilterButton
                   label="Success Rate (All)"
                   filterKey="portfolioLeaderboard-successRateAll"
                   hasActiveFilter={!!portfolioLeaderboardFilters.successRateAll.condition}
@@ -822,6 +854,14 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                       </TableHead>
                       <TableHead className="text-center px-2">
                         <SortButton 
+                          label="TRADES (CLOSED)" 
+                          sortKey="tradesClosed" 
+                          currentSortConfig={portfolioLeaderboardSortConfig}
+                          onSort={handlePortfolioLeaderboardSort}
+                        />
+                      </TableHead>
+                      <TableHead className="text-center px-2">
+                        <SortButton 
                           label="SUCCESS RATE (CLOSED)" 
                           sortKey="successRateClosed" 
                           currentSortConfig={portfolioLeaderboardSortConfig}
@@ -850,6 +890,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
                         }`}>
                           {portfolio.avgAlphaAll >= 0 ? '+' : ''}{portfolio.avgAlphaAll.toFixed(1)}%
                         </TableCell>
+                        <TableCell className="text-center px-2 py-2 text-xs">{portfolio.tradesClosed}</TableCell>
                         <TableCell className="text-center px-2 py-2 text-xs">{portfolio.successRateClosed.toFixed(1)}%</TableCell>
                         <TableCell className={`text-center font-semibold px-2 py-2 text-xs ${
                           portfolio.avgAlphaClosed >= 0 ? 'text-green-600' : 'text-red-600'
@@ -1131,6 +1172,15 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
         currentValue2={leaderboardFilters.tradesTotal.value2}
       />
       <FilterDialog
+        isOpen={activeFilterDialog === 'leaderboard-tradesClosed'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="TRADES (CLOSED)"
+        onApply={(condition, value, value2) => handleLeaderboardFilter('tradesClosed', condition, value, value2)}
+        currentCondition={leaderboardFilters.tradesClosed.condition}
+        currentValue={leaderboardFilters.tradesClosed.value}
+        currentValue2={leaderboardFilters.tradesClosed.value2}
+      />
+      <FilterDialog
         isOpen={activeFilterDialog === 'leaderboard-successRateAll'}
         onClose={() => setActiveFilterDialog(null)}
         title="SUCCESS RATE (ALL)"
@@ -1174,6 +1224,15 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
         currentCondition={portfolioLeaderboardFilters.tradesPortfolio.condition}
         currentValue={portfolioLeaderboardFilters.tradesPortfolio.value}
         currentValue2={portfolioLeaderboardFilters.tradesPortfolio.value2}
+      />
+      <FilterDialog
+        isOpen={activeFilterDialog === 'portfolioLeaderboard-tradesClosed'}
+        onClose={() => setActiveFilterDialog(null)}
+        title="TRADES (CLOSED)"
+        onApply={(condition, value, value2) => handlePortfolioLeaderboardFilter('tradesClosed', condition, value, value2)}
+        currentCondition={portfolioLeaderboardFilters.tradesClosed.condition}
+        currentValue={portfolioLeaderboardFilters.tradesClosed.value}
+        currentValue2={portfolioLeaderboardFilters.tradesClosed.value2}
       />
       <FilterDialog
         isOpen={activeFilterDialog === 'portfolioLeaderboard-successRateAll'}
