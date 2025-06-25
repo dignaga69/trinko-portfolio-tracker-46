@@ -11,7 +11,6 @@ import Community from '@/components/Community';
 import Footer from '@/components/Footer';
 import { FileText, BarChart3, Trophy, Folder } from 'lucide-react';
 import PortfolioManager from '@/components/PortfolioManager';
-import SharedPortfolioManager from '@/components/SharedPortfolioManager';
 
 interface Trade {
   id: string;
@@ -25,28 +24,12 @@ interface Trade {
   exitDate?: Date;
   closeReason?: string;
   portfolioId: string;
-  isShared?: boolean;
 }
 
 interface Portfolio {
   id: string;
   name: string;
   createdAt: Date;
-  isShared?: boolean;
-}
-
-interface SharedPortfolio {
-  id: string;
-  name: string;
-  createdAt: Date;
-  adminId: string;
-  adminName: string;
-  members: Array<{
-    id: string;
-    name: string;
-    email: string;
-  }>;
-  inviteCode: string;
 }
 
 const Index = () => {
@@ -57,7 +40,6 @@ const Index = () => {
   const [activeSection, setActiveSection] = useState('portfolio');
   const [trades, setTrades] = useState<Trade[]>([]);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
-  const [sharedPortfolios, setSharedPortfolios] = useState<SharedPortfolio[]>([]);
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<string>('');
 
   // Check if user is logged in, if not redirect to landing
@@ -70,7 +52,7 @@ const Index = () => {
   // Handle URL section parameter
   useEffect(() => {
     const section = searchParams.get('section');
-    if (section && ['portfolio', 'shared-portfolio', 'log-trade', 'performance', 'leaderboard'].includes(section)) {
+    if (section && ['portfolio', 'log-trade', 'performance', 'leaderboard'].includes(section)) {
       setActiveSection(section);
     }
   }, [searchParams]);
@@ -106,52 +88,6 @@ const Index = () => {
     }
   };
 
-  // Shared portfolio management functions
-  const handleCreateSharedPortfolio = (name: string) => {
-    const sharedPortfolio: SharedPortfolio = {
-      id: `shared-${Date.now()}`,
-      name,
-      createdAt: new Date(),
-      adminId: user?.id || 'current-user',
-      adminName: user?.user_metadata?.full_name || 'TradeGuru',
-      members: [
-        {
-          id: user?.id || 'current-user',
-          name: user?.user_metadata?.full_name || 'TradeGuru',
-          email: user?.email || 'user@example.com'
-        }
-      ],
-      inviteCode: Math.random().toString(36).substring(2, 10).toUpperCase()
-    };
-    setSharedPortfolios(prev => [...prev, sharedPortfolio]);
-  };
-
-  const handleRenameSharedPortfolio = (id: string, newName: string) => {
-    setSharedPortfolios(prev => prev.map(portfolio => 
-      portfolio.id === id ? { ...portfolio, name: newName } : portfolio
-    ));
-  };
-
-  const handleDeleteSharedPortfolio = (id: string) => {
-    setSharedPortfolios(prev => prev.filter(portfolio => portfolio.id !== id));
-    // Remove trades from deleted shared portfolio
-    setTrades(prev => prev.filter(trade => trade.portfolioId !== id));
-    // If deleted portfolio was selected, clear selection
-    if (selectedPortfolioId === id) {
-      setSelectedPortfolioId('');
-    }
-  };
-
-  const handleInviteUser = (portfolioId: string, email: string) => {
-    // In a real app, this would send an invitation email
-    console.log(`Inviting ${email} to portfolio ${portfolioId}`);
-  };
-
-  const handleLeavePortfolio = (portfolioId: string) => {
-    // Remove user from shared portfolio
-    setSharedPortfolios(prev => prev.filter(portfolio => portfolio.id !== portfolioId));
-  };
-
   const handleAddTrade = (newTrade: Omit<Trade, 'id'>) => {
     const trade: Trade = {
       ...newTrade,
@@ -180,24 +116,12 @@ const Index = () => {
   const getSectionConfig = () => {
     const configs = {
       portfolio: { icon: Folder, title: 'Portfolio' },
-      'shared-portfolio': { icon: Folder, title: 'Shared Portfolios' },
       'log-trade': { icon: FileText, title: 'Log Trade' },
       performance: { icon: BarChart3, title: 'Performance' },
       leaderboard: { icon: Trophy, title: 'Leaderboard' },
     };
     return configs[activeSection as keyof typeof configs] || configs.portfolio;
   };
-
-  // Combine regular and shared portfolios for dropdowns
-  const allPortfolios = [
-    ...portfolios,
-    ...sharedPortfolios.map(sp => ({
-      id: sp.id,
-      name: `${sp.name} (Shared)`,
-      createdAt: sp.createdAt,
-      isShared: true
-    }))
-  ];
 
   const renderContent = () => {
     switch (activeSection) {
@@ -210,23 +134,11 @@ const Index = () => {
             onDeletePortfolio={handleDeletePortfolio}
           />
         );
-      case 'shared-portfolio':
-        return (
-          <SharedPortfolioManager
-            sharedPortfolios={sharedPortfolios}
-            onCreateSharedPortfolio={handleCreateSharedPortfolio}
-            onRenameSharedPortfolio={handleRenameSharedPortfolio}
-            onDeleteSharedPortfolio={handleDeleteSharedPortfolio}
-            onInviteUser={handleInviteUser}
-            onLeavePortfolio={handleLeavePortfolio}
-            currentUserId={user?.id || 'current-user'}
-          />
-        );
       case 'log-trade':
         return (
           <LogTradeWrapper 
             trades={trades}
-            portfolios={allPortfolios}
+            portfolios={portfolios}
             onAddTrade={handleAddTrade}
             onCloseTrade={handleCloseTrade}
           />
@@ -235,13 +147,13 @@ const Index = () => {
         return (
           <PerformanceWrapper 
             trades={trades} 
-            portfolios={allPortfolios}
+            portfolios={portfolios}
             selectedPortfolioId={selectedPortfolioId}
             onPortfolioChange={setSelectedPortfolioId}
           />
         );
       case 'leaderboard':
-        return <Community isUserPrivate={isPrivate} sharedPortfolios={sharedPortfolios} />;
+        return <Community isUserPrivate={isPrivate} />;
       default:
         return (
           <PortfolioManager

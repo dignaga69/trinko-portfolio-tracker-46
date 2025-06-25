@@ -1,5 +1,7 @@
 
-import { FileText, BarChart3, Trophy, Folder, Users } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils';
+import { FileText, BarChart3, Trophy, Folder } from 'lucide-react';
 
 interface SidebarProps {
   activeSection: string;
@@ -7,37 +9,44 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
-  const sidebarItems = [
+  const { user, loading } = useAuth();
+
+  const menuItems = [
     { id: 'portfolio', label: 'Portfolio', icon: Folder },
-    { id: 'shared-portfolio', label: 'Shared Portfolios', icon: Users },
     { id: 'log-trade', label: 'Log Trade', icon: FileText },
     { id: 'performance', label: 'Performance', icon: BarChart3 },
-    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
+    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy }
   ];
 
+  if (loading) {
+    return (
+      <div className="w-64 h-full bg-white border-r border-gray-100 p-8 flex items-center justify-center">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-64 bg-gray-50 h-full pt-16 border-r border-gray-200">
-      <nav className="p-4">
-        <ul className="space-y-2">
-          {sidebarItems.map((item) => {
-            const IconComponent = item.icon;
-            return (
-              <li key={item.id}>
-                <button
-                  onClick={() => onSectionChange(item.id)}
-                  className={`w-full flex items-center px-3 py-2 text-left rounded-lg transition-colors ${
-                    activeSection === item.id
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-white'
-                  }`}
-                >
-                  <IconComponent size={20} className="mr-3" />
-                  {item.label}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+    <div className="w-64 h-full bg-white border-r border-gray-100 p-8 flex flex-col">
+      <nav className="space-y-2 flex-1">
+        {menuItems.map((item) => {
+          const IconComponent = item.icon;
+          return (
+            <button
+              key={item.id}
+              onClick={() => onSectionChange(item.id)}
+              className={cn(
+                "flex items-center gap-3 w-full text-left px-4 py-3 text-sm font-medium rounded-lg transition-colors",
+                activeSection === item.id
+                  ? "bg-gray-50 text-gray-900"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-25"
+              )}
+            >
+              <IconComponent size={18} />
+              {item.label}
+            </button>
+          );
+        })}
       </nav>
     </div>
   );
