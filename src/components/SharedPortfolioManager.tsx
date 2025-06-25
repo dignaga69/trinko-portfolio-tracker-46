@@ -216,7 +216,7 @@ const SharedPortfolioManager = ({
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-medium">{portfolio.name}</h3>
                             {isAdmin(portfolio) && (
-                              <Crown className="w-4 h-4 text-yellow-500" title="Admin" />
+                              <Crown className="w-4 h-4 text-yellow-500" />
                             )}
                           </div>
                           <p className="text-xs text-gray-500">
