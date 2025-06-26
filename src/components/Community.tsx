@@ -541,48 +541,47 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
 
   return (
     <div className="space-y-6">
+      <div className="flex space-x-1 bg-white p-1 rounded-lg border w-fit">
+        <button
+          onClick={() => setActiveView('users')}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            activeView === 'users' 
+              ? 'bg-gray-100 text-gray-900 shadow-sm' 
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Top Users
+        </button>
+        <button
+          onClick={() => setActiveView('portfolios')}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            activeView === 'portfolios' 
+              ? 'bg-gray-100 text-gray-900 shadow-sm' 
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Top Portfolios
+        </button>
+        <button
+          onClick={() => setActiveView('trades')}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            activeView === 'trades' 
+              ? 'bg-gray-100 text-gray-900 shadow-sm' 
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Top Trades
+        </button>
+      </div>
+
       <Card className="border-0 shadow-none bg-gray-50 relative">
         {isUserPrivate && <PrivacyOverlay />}
         <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-lg font-semibold">{getActiveTitle()}</h1>
-              <p className="text-sm italic text-gray-600 mt-2">
-                {getActiveDescription()}
-              </p>
-            </div>
-            <div className="flex space-x-1 bg-white p-1 rounded-lg border">
-              <button
-                onClick={() => setActiveView('users')}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  activeView === 'users' 
-                    ? 'bg-gray-100 text-gray-900 shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Top Users
-              </button>
-              <button
-                onClick={() => setActiveView('portfolios')}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  activeView === 'portfolios' 
-                    ? 'bg-gray-100 text-gray-900 shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Top Portfolios
-              </button>
-              <button
-                onClick={() => setActiveView('trades')}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  activeView === 'trades' 
-                    ? 'bg-gray-100 text-gray-900 shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Top Trades
-              </button>
-            </div>
+          <div>
+            <h1 className="text-lg font-semibold">{getActiveTitle()}</h1>
+            <p className="text-sm italic text-gray-600 mt-2">
+              {getActiveDescription()}
+            </p>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
