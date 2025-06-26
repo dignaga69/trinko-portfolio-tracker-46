@@ -529,13 +529,13 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
   const getActiveDescription = () => {
     switch (activeView) {
       case 'users':
-        return 'The best shot-callers.';
+        return 'The best shot-callers. Statistics derived from personal portfolios only.';
       case 'portfolios':
-        return 'The best performing portfolios.';
+        return 'The best performing portfolios. Statistics derived from personal portfolios only.';
       case 'trades':
-        return 'The best trades.';
+        return 'The best trades. Statistics derived from all portfolios.';
       default:
-        return 'The best shot-callers.';
+        return 'The best shot-callers. Statistics derived from personal portfolios only.';
     }
   };
 
