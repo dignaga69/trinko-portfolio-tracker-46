@@ -541,7 +541,7 @@ const Community = ({ isUserPrivate = false }: CommunityProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex space-x-1 bg-white p-1 rounded-lg border w-fit">
+      <div className="flex space-x-1 bg-white p-1 rounded-lg border w-fit ml-auto">
         <button
           onClick={() => setActiveView('users')}
           className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
